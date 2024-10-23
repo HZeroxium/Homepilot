@@ -17,9 +17,16 @@ const deviceController = {
         return res.redirect("/dashboard");
       }
 
+      // Lấy dữ liệu lịch sử nếu là thiết bị fire_smoke
+      let historicalData = [];
+      if (device.type === "fire_smoke") {
+        historicalData = await device.getHistoricalData(20); // Lấy 20 điểm dữ liệu gần nhất
+      }
+
       // Render trang tương ứng với loại thiết bị
       res.render(`devices/${deviceType}`, {
         device,
+        historicalData,
         success_msg: req.flash("success_msg"),
         error_msg: req.flash("error_msg"),
       });
@@ -64,6 +71,134 @@ const deviceController = {
       });
     } catch (error) {
       console.error("Error in postDeviceAction:", error);
+      next(error);
+    }
+  },
+
+  // Hiển thị trang thêm thiết bị
+  getAddDevicePage: (req, res) => {
+    res.render("devices/add_device", {
+      title: "Thêm thiết bị",
+      success_msg: req.flash("success_msg"),
+      error_msg: req.flash("error_msg"),
+    });
+  },
+
+  // Xử lý thêm thiết bị
+  postAddDevice: async (req, res) => {
+    const userId = req.session.user.uid;
+    const { type, name } = req.body;
+
+    try {
+      // Kiểm tra đầu vào
+      if (!type || !name) {
+        req.flash("error_msg", "Vui lòng nhập đầy đủ thông tin.");
+        return res.redirect("/devices/add");
+      }
+
+      // Tạo thiết bị mới
+      const device = await Device.createDevice(userId, type, name);
+
+      req.flash("success_msg", "Thiết bị đã được thêm thành công.");
+      res.redirect("/dashboard");
+    } catch (error) {
+      console.error("Error adding device:", error);
+      req.flash("error_msg", "Đã xảy ra lỗi khi thêm thiết bị.");
+      res.redirect("/devices/add");
+    }
+  },
+
+  // Display Edit Device Page
+  getEditDevicePage: async (req, res, next) => {
+    const { deviceId } = req.params;
+    const userId = req.session.user.uid;
+
+    try {
+      // Fetch device by ID
+      const device = await Device.getDeviceById(deviceId);
+
+      // Check if device exists and belongs to the user
+      if (!device || device.userId !== userId) {
+        req.flash(
+          "error_msg",
+          "Thiết bị không tồn tại hoặc bạn không có quyền truy cập."
+        );
+        return res.redirect("/dashboard");
+      }
+
+      res.render("devices/edit_device", {
+        title: "Chỉnh Sửa Thiết Bị",
+        device,
+        success_msg: req.flash("success_msg"),
+        error_msg: req.flash("error_msg"),
+      });
+    } catch (error) {
+      console.error("Error in getEditDevicePage:", error);
+      next(error);
+    }
+  },
+
+  // Handle Edit Device
+  postEditDevice: async (req, res, next) => {
+    const { deviceId } = req.params;
+    const userId = req.session.user.uid;
+    const { name, type } = req.body;
+
+    try {
+      // Fetch device by ID
+      const device = await Device.getDeviceById(deviceId);
+
+      // Check if device exists and belongs to the user
+      if (!device || device.userId !== userId) {
+        req.flash(
+          "error_msg",
+          "Thiết bị không tồn tại hoặc bạn không có quyền truy cập."
+        );
+        return res.redirect("/dashboard");
+      }
+
+      // Validate input
+      if (!name || !type) {
+        req.flash("error_msg", "Vui lòng nhập đầy đủ thông tin.");
+        return res.redirect(`/devices/${deviceId}/edit`);
+      }
+
+      // Update device info
+      await device.updateDeviceInfo({ name, type });
+
+      req.flash("success_msg", "Thiết bị đã được cập nhật thành công.");
+      res.redirect("/dashboard");
+    } catch (error) {
+      console.error("Error in postEditDevice:", error);
+      next(error);
+    }
+  },
+
+  // Handle Delete Device
+  deleteDevice: async (req, res, next) => {
+    const { deviceId } = req.params;
+    const userId = req.session.user.uid;
+
+    try {
+      // Fetch device by ID
+      const device = await Device.getDeviceById(deviceId);
+
+      // Check if device exists and belongs to the user
+      if (!device || device.userId !== userId) {
+        req.flash(
+          "error_msg",
+          "Thiết bị không tồn tại hoặc bạn không có quyền truy cập."
+        );
+        return res.redirect("/dashboard");
+      }
+
+      // Delete device
+      await device.delete();
+
+      req.flash("success_msg", "Thiết bị đã được xóa thành công.");
+      res.redirect("/dashboard");
+    } catch (error) {
+      console.error("Error in deleteDevice:", error);
       next(error);
     }
   },

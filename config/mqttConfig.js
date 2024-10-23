@@ -17,11 +17,13 @@ mqttClient.on("connect", () => {
   console.log("Connected to MQTT broker");
 
   // Subscribe to device status topics
-  mqttClient.subscribe("home/+/status", { qos: 1 }, (err) => {
+  mqttClient.subscribe("home/fire_smoke/status", { qos: 1 }, (err) => {
     if (err) {
       console.error("Failed to subscribe to status topics:", err);
     } else {
-      console.log("Subscribed to device status topics");
+      console.log(
+        "Subscribed to device status topics from config/mqttConfig.js"
+      );
     }
   });
 });

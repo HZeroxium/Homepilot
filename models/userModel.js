@@ -65,38 +65,38 @@ class User {
     }
   }
 
-  // // Lưu FCM Token
-  // async updateFcmToken(fcmToken) {
-  //   try {
-  //     await usersCollection.doc(this.uid).update({ fcmToken });
-  //     this.fcmToken = fcmToken;
-  //   } catch (error) {
-  //     console.error("Error updating FCM token:", error);
-  //     throw error;
-  //   }
-  // }
+  // Lưu FCM Token
+  async updateFcmToken(fcmToken) {
+    try {
+      await usersCollection.doc(this.uid).update({ fcmToken });
+      this.fcmToken = fcmToken;
+    } catch (error) {
+      console.error("Error updating FCM token:", error);
+      throw error;
+    }
+  }
 
-  // // Tìm người dùng theo ID
-  // static async findById(uid) {
-  //   try {
-  //     const doc = await usersCollection.doc(uid).get();
-  //     if (!doc.exists) {
-  //       return null;
-  //     }
-  //     const data = doc.data();
-  //     return new User(
-  //       uid,
-  //       data.email,
-  //       data.passwordHash,
-  //       data.displayName,
-  //       data.createdAt,
-  //       data.fcmToken
-  //     );
-  //   } catch (error) {
-  //     console.error("Error finding user by ID:", error);
-  //     throw error;
-  //   }
-  // }
+  // Tìm người dùng theo ID
+  static async findById(uid) {
+    try {
+      const doc = await usersCollection.doc(uid).get();
+      if (!doc.exists) {
+        return null;
+      }
+      const data = doc.data();
+      return new User(
+        uid,
+        data.email,
+        data.passwordHash,
+        data.displayName,
+        data.createdAt,
+        data.fcmToken
+      );
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = User;

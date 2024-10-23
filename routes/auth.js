@@ -2,7 +2,17 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const { forwardAuthenticated } = require("../middlewares/authMiddleware");
+const {
+  forwardAuthenticated,
+  ensureAuthenticated,
+} = require("../middlewares/authMiddleware");
+
+// Hiển thị trang thông tin người dùng
+router.post(
+  "/save-fcm-token",
+  ensureAuthenticated,
+  authController.saveFcmToken
+);
 
 // Hiển thị trang đăng ký
 router.get("/register", forwardAuthenticated, authController.getRegister);

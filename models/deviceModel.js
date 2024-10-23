@@ -145,6 +145,87 @@ class Device {
       throw error;
     }
   }
+
+  // Tạo và lưu thiết bị mới
+  static async createDevice(userId, type, name) {
+    try {
+      const uid = devicesCollection.doc().id; // Tạo UID mới
+      const device = new Device(uid, userId, type, name, "offline", {});
+      await device.save();
+      return device;
+    } catch (error) {
+      console.error("Error creating device:", error);
+      throw error;
+    }
+  }
+
+  // Update device information
+  async updateDeviceInfo({ name, type }) {
+    try {
+      if (name) this.name = name;
+      if (type) this.type = type;
+      await devicesCollection.doc(this.uid).update({
+        name: this.name,
+        type: this.type,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error updating device info:", error);
+      throw error;
+    }
+  }
+
+  // Delete device
+  async delete() {
+    try {
+      await devicesCollection.doc(this.uid).delete();
+      // Optionally, delete related subcollections (e.g., activityLogs)
+      // const activityLogs = await devicesCollection.doc(this.uid).collection('activityLogs').listDocuments();
+      // const deletePromises = activityLogs.map(doc => doc.delete());
+      // await Promise.all(deletePromises);
+      return true;
+    } catch (error) {
+      console.error("Error deleting device:", error);
+      throw error;
+    }
+  }
+
+  // Lưu dữ liệu lịch sử
+  async saveHistoricalData(dataPoint) {
+    try {
+      const historyRef = devicesCollection
+        .doc(this.uid)
+        .collection("historicalData");
+      await historyRef.add({
+        ...dataPoint,
+        timestamp: new Date(),
+      });
+    } catch (error) {
+      console.error("Error saving historical data:", error);
+      throw error;
+    }
+  }
+
+  // Lấy dữ liệu lịch sử
+  async getHistoricalData(limit = 100) {
+    try {
+      const historyRef = devicesCollection
+        .doc(this.uid)
+        .collection("historicalData");
+      const snapshot = await historyRef
+        .orderBy("timestamp", "desc")
+        .limit(limit)
+        .get();
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push(doc.data());
+      });
+      return data.reverse(); // Đảo ngược để có thứ tự tăng dần theo thời gian
+    } catch (error) {
+      console.error("Error getting historical data:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Device;

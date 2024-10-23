@@ -105,6 +105,24 @@ const authController = {
       res.redirect("/login");
     });
   },
+
+  saveFcmToken: async (req, res) => {
+    const userId = req.session.user.uid;
+    const { fcmToken } = req.body;
+
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        await user.updateFcmToken(fcmToken);
+        res.status(200).json({ message: "FCM token saved" });
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error saving FCM token:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
 };
 
 module.exports = authController;
