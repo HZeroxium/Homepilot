@@ -1,0 +1,11 @@
+<!-- views/errors/500.ejs -->
+<% title = '500 - Internal Server Error' %>
+
+<div class="error-page">
+  <h1>500 - Internal Server Error</h1>
+  <p><%= message || 'An unexpected error occurred.' %></p>
+  <% if (error && Object.keys(error).length) { %>
+    <pre><%= JSON.stringify(error, null, 2) %></pre>
+  <% } %>
+  <a href="/" class="btn">Go Back to Home</a>
+</div>

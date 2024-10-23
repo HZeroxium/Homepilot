@@ -1,0 +1,33 @@
+<!-- views/layouts/layout.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= typeof title !== 'undefined' ? title : 'My App' %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header>
+      <%- include('../partials/navbar') %>
+    </header>
+
+    <!-- Main Content: Add flex-grow to take available space -->
+    <main class="flex-grow container mx-auto py-8">
+      <% if (success_msg) { %>
+        <div class="alert alert-success"><%= success_msg %></div>
+      <% } %>
+      <% if (error_msg) { %>
+        <div class="alert alert-danger"><%= error_msg %></div>
+      <% } %>
+      <!-- Main Content -->
+      <%- body %>
+    </main>
+
+    <!-- Footer: Sticks to the bottom -->
+    <footer class="bg-dark text-white py-4">
+      <%- include('../partials/footer') %>
+    </footer>
+  </body>
+</html>

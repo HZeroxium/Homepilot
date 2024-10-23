@@ -1,0 +1,23 @@
+<!-- views/dashboard.ejs -->
+<% title = 'Dashboard' %>
+
+<main class="container mx-auto px-4">
+  <h2 class="text-2xl font-bold text-primary mb-4">Dashboard</h2>
+  <p>Xin chào, <%= user.displayName %>!</p>
+
+  <h3 class="text-xl font-semibold mt-6 mb-2">Thiết bị của bạn:</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <% devices.forEach(device => { %>
+      <div class="card">
+        <h4 class="card-title"><%= device.name %></h4>
+        <p>Loại: <%= device.type %></p>
+        <p class="device-status">Trạng thái: <%= device.status %></p>
+        <a href="/devices/<%= device.type %>" class="btn btn-primary mt-2 inline-block">Quản lý</a>
+      </div>
+    <% }) %>
+  </div>
+</main>
+
+
+<!-- Nhúng tệp JavaScript -->
+<script src="/js/main.js"></script>

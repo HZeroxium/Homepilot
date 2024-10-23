@@ -1,0 +1,13 @@
+/* public/css/src/components/cards.css */
+
+.card {
+  @apply bg-white shadow rounded p-4;
+}
+
+.card-title {
+  @apply text-lg font-semibold;
+}
+
+.card-content {
+  @apply mt-2;
+}

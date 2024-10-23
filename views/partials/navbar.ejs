@@ -1,0 +1,16 @@
+<!-- views/partials/navbar.ejs -->
+<nav class="bg-primary text-white p-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <a href="/" class="font-bold text-xl">IoT Dashboard</a>
+    <div>
+      <% if (user) { %>
+        <a href="/dashboard" class="ml-4">Dashboard</a>
+        <span class="ml-4">Xin chào, <%= user.displayName %></span>
+        <a href="/logout" class="ml-4">Đăng Xuất</a>
+      <% } else { %>
+        <a href="/login" class="ml-4">Đăng Nhập</a>
+        <a href="/register" class="ml-4">Đăng Ký</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

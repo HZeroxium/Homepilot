@@ -1,0 +1,40 @@
+<!-- views/index.ejs -->
+<% title = 'Home' %>
+
+<main class="container mx-auto px-4 py-8">
+  <div class="text-center">
+    <h1 class="text-4xl font-bold text-primary mb-4">Chào mừng đến với IoT Dashboard</h1>
+    <p class="text-lg text-gray-700 mb-6">
+      Quản lý và giám sát hệ thống IoT của bạn một cách dễ dàng và hiệu quả.
+    </p>
+    <% if (!user) { %>
+      <a href="/register" class="btn btn-primary mx-2">Đăng Ký</a>
+      <a href="/login" class="btn btn-secondary mx-2">Đăng Nhập</a>
+    <% } else { %>
+      <a href="/dashboard" class="btn btn-primary">Đi đến Dashboard</a>
+    <% } %>
+  </div>
+  <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Card 1 -->
+    <div class="card">
+      <h3 class="card-title">Giám Sát Thời Gian Thực</h3>
+      <p class="card-content">
+        Theo dõi trạng thái các thiết bị IoT của bạn ngay lập tức, mọi lúc mọi nơi.
+      </p>
+    </div>
+    <!-- Card 2 -->
+    <div class="card">
+      <h3 class="card-title">Quản Lý Thiết Bị Dễ Dàng</h3>
+      <p class="card-content">
+        Thêm, xóa và điều khiển các thiết bị IoT một cách thuận tiện.
+      </p>
+    </div>
+    <!-- Card 3 -->
+    <div class="card">
+      <h3 class="card-title">Bảo Mật Cao</h3>
+      <p class="card-content">
+        Đảm bảo an toàn cho dữ liệu và thiết bị của bạn với hệ thống bảo mật tiên tiến.
+      </p>
+    </div>
+  </div>
+</main>

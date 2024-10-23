@@ -1,0 +1,36 @@
+<!-- views/login.ejs -->
+<% title = 'Đăng Nhập' %>
+
+<main class="container mx-auto px-4">
+  <h2 class="text-2xl font-bold text-primary mb-4">Đăng Nhập</h2>
+  <form
+    action="/login"
+    method="POST"
+    class="max-w-md mx-auto bg-white shadow p-6 rounded"
+  >
+    <div class="mb-4">
+      <label for="email" class="block text-gray-700">Email:</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        required
+        class="w-full mt-1 p-2 border rounded"
+      />
+    </div>
+    <div class="mb-4">
+      <label for="password" class="block text-gray-700">Mật khẩu:</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        required
+        class="w-full mt-1 p-2 border rounded"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary w-full">Đăng Nhập</button>
+  </form>
+  <p class="text-center mt-4">
+    Bạn chưa có tài khoản? <a href="/register" class="text-primary">Đăng ký</a>
+  </p>
+</main>

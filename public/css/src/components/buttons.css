@@ -1,0 +1,27 @@
+/* public/css/src/components/buttons.css */
+.btn {
+  @apply font-semibold py-2 px-4 rounded shadow-md;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.btn-primary {
+  @apply bg-primary text-white;
+}
+
+.btn-primary:hover {
+  @apply bg-blue-600 transform scale-105;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-white;
+}
+
+.btn-secondary:hover {
+  @apply bg-green-600 transform scale-105;
+}
+
+.btn-accent {
+  @apply bg-accent text-white;
+}

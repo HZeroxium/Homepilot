@@ -1,0 +1,12 @@
+<!-- views/devices/intrusion.ejs -->
+<%- include('../layouts/layout', { title: 'Hệ Thống Phát Hiện Xâm Nhập' }) %>
+
+<main class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold text-primary mb-4">Quản Lý Hệ Thống Phát Hiện Xâm Nhập</h2>
+  <p class="mb-4">Trạng thái hiện tại: <span class="font-semibold"><%= device.status %></span></p>
+  <form action="/devices/intrusion/action" method="POST" class="flex space-x-4">
+    <button type="submit" name="action" value="arm" class="btn btn-primary">Kích hoạt</button>
+    <button type="submit" name="action" value="disarm" class="btn btn-secondary">Vô hiệu hóa</button>
+  </form>
+</main>
+

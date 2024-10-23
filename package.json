@@ -1,0 +1,42 @@
+{
+  "name": "iot_web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build:css": "npx tailwindcss -i ./public/css/src/main.css -o ./public/css/styles.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
+    "autoprefixer": "^10.4.20",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "firebase-admin": "^12.6.0",
+    "mqtt": "^5.10.1",
+    "postcss": "^8.4.47",
+    "socket.io": "^4.8.0",
+    "socket.io-client": "^4.8.0",
+    "tailwindcss": "^3.4.14"
+  },
+  "devDependencies": {
+    "cssnano": "^7.0.6",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "nodemon": "^3.1.7",
+    "postcss-import": "^16.1.0",
+    "prettier": "^3.3.3"
+  }
+}
