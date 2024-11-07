@@ -1,4 +1,5 @@
 <!-- views/devices/access_control.ejs -->
+
 <% title = 'Hệ Thống Kiểm Soát Truy Cập' %>
 
 <main class="container mx-auto px-4 py-8">
@@ -6,12 +7,12 @@
     Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
   <p class="mb-4">
-    Trạng thái cửa: <span class="font-semibold"><%= device.doorStatus %></span>
+    Trạng thái cửa: <span class="font-semibold"><%= device.data.doorStatus || 'Unknown' %></span>
   </p>
   <form
     action="/devices/access_control/action"
     method="POST"
-    class="flex space-x-4"
+    class="flex space-x-4 mb-4"
   >
     <button type="submit" name="action" value="unlock" class="btn btn-primary">
       Mở Khóa
@@ -20,4 +21,7 @@
       Khóa
     </button>
   </form>
+  <a href="/devices/access_control/change_password" class="btn btn-secondary">
+    Thay Đổi Mật Khẩu
+  </a>
 </main>

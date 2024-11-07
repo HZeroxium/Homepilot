@@ -16,14 +16,12 @@ const mqttClient = mqtt.connect(process.env.MQTT_BROKER_URL, mqttOptions);
 mqttClient.on("connect", () => {
   console.log("Connected to MQTT broker");
 
-  // Subscribe to device status topics
-  mqttClient.subscribe("home/fire_smoke/status", { qos: 1 }, (err) => {
+  // Subscribe to all device data topics using wildcard
+  mqttClient.subscribe("home/+/+/+/data", { qos: 1 }, (err) => {
     if (err) {
-      console.error("Failed to subscribe to status topics:", err);
+      console.error("Failed to subscribe to data topics:", err);
     } else {
-      console.log(
-        "Subscribed to device status topics from config/mqttConfig.js"
-      );
+      console.log("Subscribed to all device data topics: home/+/+/+/data");
     }
   });
 });

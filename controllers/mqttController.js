@@ -16,33 +16,68 @@ const mqttController = (io) => {
   mqttClient.on("message", async (topic, message) => {
     try {
       const payload = JSON.parse(message.toString());
-      let [home, deviceType, messageType] = topic.split("/");
+      const [home, userId, deviceType, deviceId, messageType] =
+        topic.split("/");
 
       console.log(`Received message from ${deviceType}:`, payload);
       console.log(`Message type: ${messageType}`);
 
-      if (messageType === "status") {
-        const deviceId = payload.deviceId;
+      if (messageType === "data") {
+        // const deviceId = payload.deviceId;
         const deviceStatus = payload.status;
         const deviceData = payload.data || {};
 
         // Cập nhật trạng thái thiết bị trong Firestore
         const device = await Device.getDeviceById(deviceId);
         if (device) {
-          await device.updateStatus(deviceStatus);
-          await device.updateData(deviceData);
-          console.log(`Updated status for device ${deviceId}`);
+          if (deviceStatus) {
+            await device.updateStatus(deviceStatus);
+            console.log(
+              `Updated status for device ${deviceId} to ${deviceStatus}`
+            );
+          }
+          // if (deviceData) {
+          //   await device.updateData(deviceData);
+          //   console.log(`Updated data for device ${deviceId} to`, deviceData);
+          // }
 
-          if (device.type === "fire_smoke") {
+          if (device.type === "fire_smoke" && deviceData) {
+            // Kiểm tra nhiệt độ và độ ẩm
+            const { temperature, humidity } = deviceData;
+            if (temperature > 50 || humidity > 80) {
+              // Gửi email cảnh báo
+              const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: process.env.EMAIL_USER,
+                subject: "Cảnh báo cháy nổ",
+                text: `Thiết bị ${deviceId} phát hiện nhiệt độ hoặc độ ẩm vượt ngưỡng an toàn.`,
+              };
+
+              transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                  console.error("Error sending email:", error);
+                } else {
+                  console.log("Email sent:", info.response);
+                }
+              });
+
+              deviceData.alertStatus = true;
+            }
+
             await device.saveHistoricalData({
               temperature: deviceData.temperature,
               humidity: deviceData.humidity,
-              alertStatus: deviceData.alertStatus,
+              alertStatus: deviceData.alertStatus ? "Danger" : "Normal",
             });
 
             console.log(`Saved historical data for device ${deviceId}`);
+          } else if (device.type === "access_control" && deviceData) {
+            // Kiểm tra trạng thái cửa
+            await device.saveHistoricalData({
+              method: deviceData.method,
+              status: deviceStatus,
+            });
           }
-
           // Phát sự kiện tới client qua Socket.io
           io.to(device.userId).emit("deviceDataUpdate", {
             deviceId,
@@ -58,30 +93,6 @@ const mqttController = (io) => {
     } catch (error) {
       console.error("Error handling MQTT message:", error);
     }
-
-    // if (messageType === "alert") {
-    //   const alertType = payload.alertType;
-    //   const alertMessage = payload.message;
-
-    //   // Lấy thông tin thiết bị và người dùng
-    //   const device = await Device.getDeviceById(payload.deviceId);
-    //   if (device) {
-    //     const user = await User.findById(device.userId);
-    //     if (user && user.fcmToken) {
-    //       // Gửi thông báo tới người dùng
-    //       const notification = {
-    //         title: "Cảnh báo từ hệ thống",
-    //         body: alertMessage,
-    //       };
-    //       const message = {
-    //         token: user.fcmToken,
-    //         notification,
-    //       };
-    //       await messaging.send(message);
-    //       console.log(`Sent notification to user ${user.uid}`);
-    //     }
-    //   }
-    // }
   });
 };
 

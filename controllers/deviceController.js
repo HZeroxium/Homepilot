@@ -50,12 +50,16 @@ const deviceController = {
         return res.redirect("/dashboard");
       }
 
-      // Publish lệnh điều khiển tới MQTT broker
-      const topic = `home/${deviceType}/command`;
+      // Publish lệnh điều khiển tới MQTT broker với cấu trúc topic mới
+      const topic = `home/${userId}/${deviceType}/${device.uid}/command`;
       const message = JSON.stringify({
         deviceId: device.uid,
         action,
       });
+
+      // if (deviceType === "access_control") {
+
+      // }
 
       mqttClient.publish(topic, message, { qos: 1 }, async (err) => {
         if (err) {
@@ -199,6 +203,76 @@ const deviceController = {
       res.redirect("/dashboard");
     } catch (error) {
       console.error("Error in deleteDevice:", error);
+      next(error);
+    }
+  },
+
+  // Hiển thị trang thay đổi mật khẩu
+  getChangePasswordPage: async (req, res, next) => {
+    const userId = req.session.user.uid;
+    const deviceType = "access_control";
+
+    try {
+      const device = await Device.getDeviceByType(userId, deviceType);
+
+      if (!device) {
+        req.flash("error_msg", "Thiết bị không tồn tại.");
+        return res.redirect("/dashboard");
+      }
+
+      res.render("devices/change_password", {
+        device,
+        success_msg: req.flash("success_msg"),
+        error_msg: req.flash("error_msg"),
+      });
+    } catch (error) {
+      console.error("Error in getChangePasswordPage:", error);
+      next(error);
+    }
+  },
+
+  // Xử lý thay đổi mật khẩu
+  postChangePassword: async (req, res, next) => {
+    const userId = req.session.user.uid;
+    const deviceType = "access_control";
+    const { newPassword, confirmPassword } = req.body;
+
+    try {
+      const device = await Device.getDeviceByType(userId, deviceType);
+
+      if (!device) {
+        req.flash("error_msg", "Thiết bị không tồn tại.");
+        return res.redirect("/dashboard");
+      }
+
+      // Kiểm tra mật khẩu mới
+      if (!newPassword || newPassword !== confirmPassword) {
+        req.flash("error_msg", "Mật khẩu không khớp.");
+        return res.redirect("/devices/access_control/change_password");
+      }
+
+      // Cập nhật mật khẩu
+      await device.updatePassword(newPassword);
+
+      // Gửi lệnh cập nhật mật khẩu đến thiết bị qua MQTT
+      const topic = `home/${userId}/access_control/${device.uid}/command`;
+      const message = JSON.stringify({
+        deviceId: device.uid,
+        action: "update_pin",
+        parameters: newPassword,
+      });
+
+      mqttClient.publish(topic, message, { qos: 1 }, async (err) => {
+        if (err) {
+          console.error("Error publishing to MQTT:", err);
+          req.flash("error_msg", "Không thể gửi lệnh đến thiết bị.");
+        } else {
+          req.flash("success_msg", "Mật khẩu đã được cập nhật thành công.");
+        }
+        res.redirect("/devices/access_control");
+      });
+    } catch (error) {
+      console.error("Error in postChangePassword:", error);
       next(error);
     }
   },

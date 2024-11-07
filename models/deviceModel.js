@@ -1,7 +1,7 @@
 // models/deviceModel.js
 
 const { db } = require("../config/firebaseConfig");
-
+const bcrypt = require("bcrypt");
 const devicesCollection = db.collection("devices");
 
 class Device {
@@ -223,6 +223,31 @@ class Device {
       return data.reverse(); // Đảo ngược để có thứ tự tăng dần theo thời gian
     } catch (error) {
       console.error("Error getting historical data:", error);
+      throw error;
+    }
+  }
+
+  // Cập nhật mật khẩu thiết bị (phải được mã hóa)
+  async updatePassword(newPassword) {
+    try {
+      // Mã hóa mật khẩu trước khi lưu
+      // const hashedPassword = await bcrypt.hash(newPassword, 10);
+      this.data.password = newPassword;
+      await devicesCollection
+        .doc(this.uid)
+        .update({ "data.password": newPassword });
+    } catch (error) {
+      console.error("Error updating device password:", error);
+      throw error;
+    }
+  }
+
+  // So sánh mật khẩu nhập vào với mật khẩu lưu trữ
+  async comparePassword(inputPassword) {
+    try {
+      return await bcrypt.compare(inputPassword, this.data.password);
+    } catch (error) {
+      console.error("Error comparing device password:", error);
       throw error;
     }
   }

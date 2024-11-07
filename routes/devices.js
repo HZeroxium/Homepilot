@@ -34,4 +34,16 @@ router.get("/", (req, res) => {
   res.redirect("/dashboard");
 });
 
+// Hiển thị trang thay đổi mật khẩu
+router.get(
+  "/access_control/change_password",
+  deviceController.getChangePasswordPage
+);
+
+// Xử lý thay đổi mật khẩu
+router.post(
+  "/access_control/change_password",
+  deviceController.postChangePassword
+);
+
 module.exports = router;
