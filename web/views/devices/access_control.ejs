@@ -7,7 +7,10 @@
     Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
   <p class="mb-4">
-    Trạng thái cửa: <span class="font-semibold"><%= device.data.doorStatus || 'Unknown' %></span>
+    Trạng thái cửa:
+    <span class="font-semibold"
+      ><%= device.data.doorStatus || 'Unknown' %></span
+    >
   </p>
   <form
     action="/devices/access_control/action"

@@ -78,7 +78,7 @@ const deviceController = {
           req.flash("success_msg", "Command sent to the device.");
 
           // Log the activity for the device
-          await device.logActivity(action, userId);
+          // await device.logActivity(action, userId);
         }
         // Redirect to the device management page
         res.redirect(`/devices/${deviceType}`);
@@ -102,7 +102,6 @@ const deviceController = {
       error_msg: req.flash("error_msg"),
     });
   },
-
 
   /**
    * Handle adding a new device.
@@ -287,7 +286,6 @@ const deviceController = {
       next(error);
     }
   },
-
 
   /**
    * Handle changing the password for access control devices.
