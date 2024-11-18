@@ -241,8 +241,195 @@ class Device {
       throw error;
     }
   }
+  /**
+   * Creates a new device and saves it to Firestore.
+   * @param {string} userId - The ID of the user who owns the device.
+   * @param {string} type - The type of the device (e.g., "fire_smoke", "door").
+   * @param {string} name - The name of the device.
+   * @returns {Promise<Device>} - Resolves to the newly created Device object.
+   * @throws Will throw an error if there's an issue during device creation.
+   */
+  static async createDevice(userId, type, name) {
+    try {
+      // Generate a new unique ID for the device
+      const uid = devicesCollection.doc().id;
 
-  // Additional methods omitted for brevity. Implement similarly.
+      // Instantiate a new Device object with the provided details
+      const device = new Device(uid, userId, type, name, "offline", {});
+
+      // Save the device to Firestore
+      await device.save();
+
+      // Return the created Device object
+      return device;
+    } catch (error) {
+      // Log the error if device creation fails
+      console.error("Error creating device:", error);
+      // Propagate the error further
+      throw error;
+    }
+  }
+  /**
+   * Updates the device's information (name and/or type).
+   * @param {object} deviceInfo - Object containing the new name and/or type.
+   * @param {string} deviceInfo.name - New name of the device.
+   * @param {string} deviceInfo.type - New type of the device.
+   * @returns {Promise<boolean>} - Resolves to true if the device info is updated successfully.
+   * @throws Will throw an error if there's an issue during updating the device info.
+   */
+  async updateDeviceInfo({ name, type }) {
+    try {
+      // Update the device's name and/or type
+      if (name) this.name = name;
+      if (type) this.type = type;
+
+      // Update the device document in Firestore
+      await devicesCollection.doc(this.uid).update({
+        name: this.name,
+        type: this.type,
+      });
+
+      // Return true if the device info is updated successfully
+      return true;
+    } catch (error) {
+      // Log an error message if there's an issue updating the device info
+      console.error("Error updating device info:", error);
+      // Propagate the error further
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes the device and its associated data.
+   *
+   * Removes the device document from Firestore, and optionally deletes
+   * related subcollections such as activity logs.
+   *
+   * @returns {Promise<boolean>} - Resolves to true if the device is deleted successfully.
+   * @throws Will throw an error if there's an issue during deletion.
+   */
+  async delete() {
+    try {
+      // Delete the device document from Firestore
+      await devicesCollection.doc(this.uid).delete();
+
+      // Optionally, delete related subcollections (e.g., activityLogs)
+      // const activityLogs = await devicesCollection.doc(this.uid).collection('activityLogs').listDocuments();
+      // const deletePromises = activityLogs.map(doc => doc.delete());
+      // await Promise.all(deletePromises);
+
+      // Return true if the device is deleted successfully
+      return true;
+    } catch (error) {
+      // Log an error message if there's an issue deleting the device
+      console.error("Error deleting device:", error);
+      // Propagate the error further
+      throw error;
+    }
+  }
+
+  /**
+   * Saves a new historical data point for the device.
+   *
+   * Creates a new document in the device's "historicalData" subcollection in
+   * Firestore, containing the provided data point and a timestamp.
+   *
+   * @param {Object} dataPoint - The historical data point to save (e.g., {temp: 22.5, humidity: 55}).
+   * @returns {Promise<void>} - Resolves when the data point is saved.
+   * @throws Will throw an error if there's an issue saving the data.
+   */
+  async saveHistoricalData(dataPoint) {
+    try {
+      const historyRef = devicesCollection
+        .doc(this.uid)
+        .collection("historicalData");
+      await historyRef.add({
+        ...dataPoint,
+        timestamp: new Date(),
+      });
+    } catch (error) {
+      console.error("Error saving historical data:", error);
+      throw error;
+    }
+  }
+  /**
+   * Retrieves historical data for the device.
+   *
+   * Fetches a limited number of historical data entries from the device's
+   * historical data collection in Firestore, ordered by timestamp.
+   *
+   * @param {number} limit - The maximum number of historical data entries to retrieve.
+   * @returns {Promise<Array<Object>>} - Resolves to an array of historical data objects.
+   * @throws Will throw an error if there's an issue retrieving the data.
+   */
+  async getHistoricalData(limit = 100) {
+    try {
+      // Reference to the historical data subcollection of this device
+      const historyRef = devicesCollection
+        .doc(this.uid)
+        .collection("historicalData");
+
+      // Query the subcollection, ordering by timestamp and limiting the number of results
+      const snapshot = await historyRef
+        .orderBy("timestamp", "desc")
+        .limit(limit)
+        .get();
+
+      // Collect the data from the query snapshot
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push(doc.data());
+      });
+
+      // Return the collected data in chronological order
+      return data.reverse();
+    } catch (error) {
+      // Log the error and rethrow it for further handling
+      console.error("Error getting historical data:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates the device's password.
+   * @param {string} newPassword - The new plain text password to store.
+   * @returns {Promise<void>} - Resolves when the password is updated.
+   * @throws Will throw an error if there's an issue updating the password.
+   */
+  async updatePassword(newPassword) {
+    try {
+      // Update the stored password in the device document
+      this.data.password = newPassword;
+      // Update the password in the Firestore document
+      await devicesCollection
+        .doc(this.uid)
+        .update({ "data.password": newPassword });
+    } catch (error) {
+      // Log the error if password update fails
+      console.error("Error updating device password:", error);
+      // Propagate the error further
+      throw error;
+    }
+  }
+
+  /**
+   * Compares the provided password with the stored device password.
+   * Utilizes bcrypt to securely compare the password against the stored hash.
+   * @param {string} inputPassword - The plain text password to compare.
+   * @returns {Promise<boolean>} - Resolves to true if the password matches, false otherwise.
+   * @throws Will throw an error if there's an issue during comparison.
+   */
+  async comparePassword(inputPassword) {
+    try {
+      // Compare the input password with the stored hashed password
+      return await bcrypt.compare(inputPassword, this.data.password);
+    } catch (error) {
+      // Log the error if password comparison fails
+      console.error("Error comparing device password:", error);
+      // Propagate the error further
+      throw error;
+    }
+  }
 }
 
 export default Device;
