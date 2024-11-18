@@ -1,17 +1,18 @@
 // routes/devices.js
 
-const express = require("express");
-const router = express.Router();
-const deviceController = require("../controllers/deviceController");
-const { ensureAuthenticated } = require("../middlewares/authMiddleware");
+import express from "express";
+import deviceController from "../controllers/deviceController.js";
+import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
-// Áp dụng middleware ensureAuthenticated cho tất cả các route
+const router = express.Router();
+
+// Apply ensureAuthenticated middleware to all routes
 router.use(ensureAuthenticated);
 
-// Hiển thị trang thêm thiết bị
+// Display Add Device Page
 router.get("/add", deviceController.getAddDevicePage);
 
-// Xử lý thêm thiết bị
+// Handle Add Device
 router.post("/add", deviceController.postAddDevice);
 
 // Display Edit Device Page
@@ -23,27 +24,27 @@ router.post("/:deviceId/edit", deviceController.postEditDevice);
 // Handle Delete Device
 router.post("/:deviceId/delete", deviceController.deleteDevice);
 
-// Hiển thị trang quản lý thiết bị
+// Display Device Management Page
 router.get("/:deviceType", deviceController.getDevicePage);
 
-// Xử lý hành động điều khiển thiết bị
+// Handle Device Actions
 router.post("/:deviceType/action", deviceController.postDeviceAction);
 
-// Chuyển hướng mặc định
+// Default redirect
 router.get("/", (req, res) => {
   res.redirect("/dashboard");
 });
 
-// Hiển thị trang thay đổi mật khẩu
+// Display Change Password Page
 router.get(
   "/access_control/change_password",
   deviceController.getChangePasswordPage
 );
 
-// Xử lý thay đổi mật khẩu
+// Handle Change Password
 router.post(
   "/access_control/change_password",
   deviceController.postChangePassword
 );
 
-module.exports = router;
+export default router;
