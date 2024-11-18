@@ -1,9 +1,12 @@
-const express = require("express");
+// routes/index.js
+
+import express from "express";
+import authRoutes from "./auth.js";
+import dashboardRoutes from "./dashboard.js";
+import devicesRoutes from "./devices.js";
+import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const authRoutes = require("./auth");
-const dashboardRoutes = require("./dashboard");
-const devicesRoutes = require("./devices");
-const { ensureAuthenticated } = require("../middlewares/authMiddleware");
 const chatbotRoutes = require("./chatbot");
 
 // Other routes
@@ -12,7 +15,7 @@ router.use("/dashboard", ensureAuthenticated, dashboardRoutes);
 router.use("/devices", ensureAuthenticated, devicesRoutes);
 router.use("/chatbot", ensureAuthenticated, chatbotRoutes);
 
-// Catch-all route for non-existent routes (404)
+// Handle non-existent routes
 router.use((req, res) => {
   res.status(404).render("errors/404", {
     title: "404 - Page Not Found",
@@ -20,4 +23,4 @@ router.use((req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

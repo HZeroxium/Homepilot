@@ -1,37 +1,39 @@
 // routes/auth.js
-const express = require("express");
-const router = express.Router();
-const authController = require("../controllers/authController");
-const {
+
+import express from "express";
+import authController from "../controllers/authController.js";
+import {
   forwardAuthenticated,
   ensureAuthenticated,
-} = require("../middlewares/authMiddleware");
+} from "../middlewares/authMiddleware.js";
 
-// Hiển thị trang thông tin người dùng
+const router = express.Router();
+
+// Save FCM Token
 router.post(
   "/save-fcm-token",
   ensureAuthenticated,
   authController.saveFcmToken
 );
 
-// Hiển thị trang đăng ký
+// Display Register Page
 router.get("/register", forwardAuthenticated, authController.getRegister);
 
-// Xử lý đăng ký người dùng
+// Handle User Registration
 router.post("/register", forwardAuthenticated, authController.postRegister);
 
-// Hiển thị trang đăng nhập
+// Display Login Page
 router.get("/login", forwardAuthenticated, authController.getLogin);
 
-// Xử lý đăng nhập người dùng
+// Handle User Login
 router.post("/login", forwardAuthenticated, authController.postLogin);
 
-// Xử lý đăng xuất
+// Handle User Logout
 router.get("/logout", authController.logout);
 
-// Xử lí trang đầu
+// Render Home Page
 router.get("/", (req, res) => {
   res.render("index");
 });
 
-module.exports = router;
+export default router;

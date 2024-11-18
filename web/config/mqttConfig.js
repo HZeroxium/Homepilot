@@ -1,6 +1,6 @@
 // config/mqttConfig.js
-const mqtt = require("mqtt");
-const appConfig = require("./appConfig");
+
+import mqtt from "mqtt";
 
 const mqttOptions = {
   clientId: `web_client_${Math.random().toString(16).substr(2, 8)}`,
@@ -30,4 +30,4 @@ mqttClient.on("error", (err) => {
   console.error("MQTT connection error:", err);
 });
 
-module.exports = mqttClient;
+export default mqttClient;

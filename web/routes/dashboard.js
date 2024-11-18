@@ -1,13 +1,15 @@
 // routes/dashboard.js
-const express = require("express");
-const router = express.Router();
-const dashboardController = require("../controllers/dashboardController");
-const { ensureAuthenticated } = require("../middlewares/authMiddleware");
 
-// Áp dụng middleware ensureAuthenticated cho tất cả các route trong router này
+import express from "express";
+import dashboardController from "../controllers/dashboardController.js";
+import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
+
+const router = express.Router();
+
+// Apply ensureAuthenticated middleware to all routes
 router.use(ensureAuthenticated);
 
-// Hiển thị trang dashboard
+// Display dashboard page
 router.get("/", dashboardController.getDashboard);
 
-module.exports = router;
+export default router;
