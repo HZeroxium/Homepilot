@@ -4,3 +4,4 @@ gpt
 config/serviceAccountKey.json
 package-lock.json
 .env
+.DS_Store
