@@ -15,6 +15,8 @@ const transporter = nodemailer.createTransport({
 const mqttController = (io) => {
   mqttClient.on("message", async (topic, message) => {
     try {
+      console.log(`message:_` + message + '_')
+      console.log(`topic: ` + topic)
       const payload = JSON.parse(message.toString());
       const [home, userId, deviceType, deviceId, messageType] =
         topic.split("/");
@@ -26,7 +28,6 @@ const mqttController = (io) => {
         // const deviceId = payload.deviceId;
         const deviceStatus = payload.status;
         const deviceData = payload.data || {};
-
         // Cập nhật trạng thái thiết bị trong Firestore
         const device = await Device.getDeviceById(deviceId);
         if (device) {
@@ -43,32 +44,22 @@ const mqttController = (io) => {
 
           if (device.type === "fire_smoke" && deviceData) {
             // Kiểm tra nhiệt độ và độ ẩm
-            const { temperature, humidity } = deviceData;
-            if (temperature > 50 || humidity > 80) {
+            if (deviceData.temperature > 50 || deviceData.humidity > 80) {
               // Gửi email cảnh báo
-              const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: process.env.EMAIL_USER,
-                subject: "Cảnh báo cháy nổ",
-                text: `Thiết bị ${deviceId} phát hiện nhiệt độ hoặc độ ẩm vượt ngưỡng an toàn.`,
-              };
-
-              transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                  console.error("Error sending email:", error);
-                } else {
-                  console.log("Email sent:", info.response);
-                }
-              });
-
+              // ...
+              console.log("Alert! Temperature or humidity is too high");
               deviceData.alertStatus = true;
             }
 
-            await device.saveHistoricalData({
-              temperature: deviceData.temperature,
-              humidity: deviceData.humidity,
+            const historicalData = {
+              temperature: deviceData.temperature || 0,
+              humidity: deviceData.humidity || 0,
+              light: deviceData.light || 0,
               alertStatus: deviceData.alertStatus ? "Danger" : "Normal",
-            });
+            }
+            console.log(historicalData)
+
+            await device.saveHistoricalData(historicalData);
 
             console.log(`Saved historical data for device ${deviceId}`);
           } else if (device.type === "access_control" && deviceData) {

@@ -8,6 +8,7 @@ const appConfig = require("./config/appConfig");
 const routes = require("./routes/index");
 const mqttController = require("./controllers/mqttController");
 const sharedsession = require("express-socket.io-session");
+const { getGroqChatCompletion } = require("./utils/getCompletion");
 
 const app = express();
 const server = http.createServer(app);
@@ -74,6 +75,25 @@ app.use((req, res, next) => {
 // Định nghĩa các routes
 app.use("/", routes);
 
+// Chatbot route
+app.get("/chatbot", (req, res) => {
+  res.render("chatbot", { user: req.session.user || null });
+});
+
+app.post("/chatbot", async (req, res) => {
+  const { message } = req.body;
+  try {
+    // Get chatbot completion from the LLM
+    const chatCompletion = await getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
+    res.json({
+      reply: chatCompletion.choices[0]?.message?.content || "No response",
+    });
+  } catch (error) {
+    console.error("Error during chat completion:", error);
+    res.status(500).json({ error: "An error occurred while processing your request." });
+  }
+});
+
 // Middleware xử lý lỗi
 const { errorHandler } = require("./middlewares/errorMiddleware");
 app.use(errorHandler);
@@ -100,6 +120,20 @@ io.on("connection", (socket) => {
     const userId = data.userId;
     socket.join(userId);
     console.log(`Socket ${socket.id} joined room ${userId} on joinRoom event`);
+  });
+
+  // Listen for chat messages from the frontend
+  socket.on("chatMessage", async (message) => {
+    try {
+      const chatCompletion = await require("./utils/getCompletion").getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
+      const botResponse = chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't understand your message.";
+
+      // Send the bot's response back to the client
+      socket.emit("botResponse", botResponse);
+    } catch (error) {
+      console.error("Error in chat: ", error);
+      socket.emit("botResponse", "Sorry, there was an error processing your message.");
+    }
   });
 });
 
