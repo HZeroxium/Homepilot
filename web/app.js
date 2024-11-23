@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
 import { errorHandler } from "./middlewares/errorMiddleware.js";
 import { Server as SocketIO } from "socket.io";
+const { getGroqChatCompletion } = require("./utils/getCompletion");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
