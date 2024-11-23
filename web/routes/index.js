@@ -4,16 +4,13 @@ const authRoutes = require("./auth");
 const dashboardRoutes = require("./dashboard");
 const devicesRoutes = require("./devices");
 const { ensureAuthenticated } = require("../middlewares/authMiddleware");
-
-// Define the chatbot route
-router.get("/chatbot", (req, res) => {
-  res.render("chatbot", { user: req.session.user || null });
-});
+const chatbotRoutes = require("./chatbot");
 
 // Other routes
 router.use("/", authRoutes);
 router.use("/dashboard", ensureAuthenticated, dashboardRoutes);
 router.use("/devices", ensureAuthenticated, devicesRoutes);
+router.use("/chatbot", ensureAuthenticated, chatbotRoutes);
 
 // Catch-all route for non-existent routes (404)
 router.use((req, res) => {

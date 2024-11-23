@@ -8,7 +8,6 @@ const appConfig = require("./config/appConfig");
 const routes = require("./routes/index");
 const mqttController = require("./controllers/mqttController");
 const sharedsession = require("express-socket.io-session");
-const { getGroqChatCompletion } = require("./utils/getCompletion");
 
 const app = express();
 const server = http.createServer(app);
@@ -74,25 +73,6 @@ app.use((req, res, next) => {
 
 // Định nghĩa các routes
 app.use("/", routes);
-
-// Chatbot route
-app.get("/chatbot", (req, res) => {
-  res.render("chatbot", { user: req.session.user || null });
-});
-
-app.post("/chatbot", async (req, res) => {
-  const { message } = req.body;
-  try {
-    // Get chatbot completion from the LLM
-    const chatCompletion = await getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
-    res.json({
-      reply: chatCompletion.choices[0]?.message?.content || "No response",
-    });
-  } catch (error) {
-    console.error("Error during chat completion:", error);
-    res.status(500).json({ error: "An error occurred while processing your request." });
-  }
-});
 
 // Middleware xử lý lỗi
 const { errorHandler } = require("./middlewares/errorMiddleware");
