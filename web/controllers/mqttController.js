@@ -25,8 +25,6 @@ const mqttController = (io) => {
    */
   mqttClient.on("message", async (topic, message) => {
     try {
-      console.log(`message:_` + message + '_')
-      console.log(`topic: ` + topic)
       /**
        * Parses the message payload and extracts the home, user ID, device type, device ID, and message type.
        * @type {Object}
@@ -44,6 +42,7 @@ const mqttController = (io) => {
          */
         const deviceStatus = payload.status;
         const deviceData = payload.data || {};
+
         const device = await Device.getDeviceById(deviceId);
         if (device) {
           if (deviceStatus) {
@@ -57,14 +56,19 @@ const mqttController = (io) => {
           }
 
           if (device.type === "fire_smoke" && deviceData) {
-            // Kiểm tra nhiệt độ và độ ẩm
+            /**
+             * Checks if the temperature and humidity levels are unsafe and sends an email if so.
+             */
             if (deviceData.temperature > 50 || deviceData.humidity > 80) {
-              // Gửi email cảnh báo
-              // ...
+              /**
+               * Sends an email to the user.
+               */
               console.log("Alert! Temperature or humidity is too high");
               deviceData.alertStatus = true;
             }
-
+             /**
+             * Saves the historical data for the device.
+             */
             const historicalData = {
               temperature: deviceData.temperature || 0,
               humidity: deviceData.humidity || 0,
