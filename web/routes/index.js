@@ -7,7 +7,7 @@ import devicesRoutes from "./devices.js";
 import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
-const chatbotRoutes = require("./chatbot");
+import chatbotRoutes from "./chatbot.js";
 
 // Other routes
 router.use("/", authRoutes);

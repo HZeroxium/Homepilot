@@ -1,5 +1,5 @@
-const Groq = require("groq-sdk");
-const dotenv = require('dotenv');
+import Groq from "groq-sdk";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -40,4 +40,4 @@ Note: Chỉ trả lời các câu hỏi liên quan đến hệ thống IOT, các
 // }
 // main();
 
-module.exports = { getGroqChatCompletion };
+export { getGroqChatCompletion };

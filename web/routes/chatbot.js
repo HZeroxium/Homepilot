@@ -1,12 +1,12 @@
 // routes/chatbot.js
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const chatbotController = require("../controllers/chatbotController");
-const { ensureAuthenticated } = require("../middlewares/authMiddleware");
+import chatbotController from "../controllers/chatbotController.js";
+import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
 router.use(ensureAuthenticated);
 
 router.get("/", chatbotController.getChatbotPage);
 router.post("/message", chatbotController.sendMessage);
 
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
 // controllers/chatbotController.js
-const { getGroqChatCompletion } = require("../utils/getCompletion");
+import { getGroqChatCompletion } from "../utils/getCompletion.js";
 
 async function getChatbotPage(req, res) {
   res.render("chatbot", { messages: [] });
@@ -25,7 +25,4 @@ async function sendMessage(req, res) {
   }
 }
 
-module.exports = {
-  getChatbotPage,
-  sendMessage
-};
+export default { getChatbotPage, sendMessage };

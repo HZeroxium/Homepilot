@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
 import { errorHandler } from "./middlewares/errorMiddleware.js";
 import { Server as SocketIO } from "socket.io";
-const { getGroqChatCompletion } = require("./utils/getCompletion");
+import {getGroqChatCompletion} from "./utils/getCompletion.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,7 +111,7 @@ io.on("connection", (socket) => {
   // Listen for chat messages from the frontend
   socket.on("chatMessage", async (message) => {
     try {
-      const chatCompletion = await require("./utils/getCompletion").getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
+      const chatCompletion = await getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
       const botResponse = chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't understand your message.";
 
       // Send the bot's response back to the client
