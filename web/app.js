@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import expressLayouts from "express-ejs-layouts";
 import { errorHandler } from "./middlewares/errorMiddleware.js";
 import { Server as SocketIO } from "socket.io";
+import {getGroqChatCompletion} from "./utils/getCompletion.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,6 +106,20 @@ io.on("connection", (socket) => {
     const userId = data.userId;
     socket.join(userId);
     console.log(`Socket ${socket.id} joined room ${userId} on joinRoom event`);
+  });
+
+  // Listen for chat messages from the frontend
+  socket.on("chatMessage", async (message) => {
+    try {
+      const chatCompletion = await getGroqChatCompletion(message, "llama3-groq-70b-8192-tool-use-preview");
+      const botResponse = chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't understand your message.";
+
+      // Send the bot's response back to the client
+      socket.emit("botResponse", botResponse);
+    } catch (error) {
+      console.error("Error in chat: ", error);
+      socket.emit("botResponse", "Sorry, there was an error processing your message.");
+    }
   });
 });
 

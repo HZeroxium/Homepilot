@@ -59,37 +59,25 @@ const mqttController = (io) => {
             /**
              * Checks if the temperature and humidity levels are unsafe and sends an email if so.
              */
-            const { temperature, humidity } = deviceData;
-            if (temperature > 50 || humidity > 80) {
-              const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: process.env.EMAIL_USER,
-                subject: "Fire Alert",
-                text: `Device ${deviceId} detected unsafe temperature or humidity levels.`,
-              };
-
+            if (deviceData.temperature > 50 || deviceData.humidity > 80) {
               /**
                * Sends an email to the user.
                */
-              transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                  console.error("Error sending email:", error);
-                } else {
-                  console.log("Email sent:", info.response);
-                }
-              });
-
+              console.log("Alert! Temperature or humidity is too high");
               deviceData.alertStatus = true;
             }
-
-            /**
+             /**
              * Saves the historical data for the device.
              */
-            await device.saveHistoricalData({
-              temperature: deviceData.temperature,
-              humidity: deviceData.humidity,
+            const historicalData = {
+              temperature: deviceData.temperature || 0,
+              humidity: deviceData.humidity || 0,
+              light: deviceData.light || 0,
               alertStatus: deviceData.alertStatus ? "Danger" : "Normal",
-            });
+            }
+            console.log(historicalData)
+
+            await device.saveHistoricalData(historicalData);
 
             console.log(`Saved historical data for device ${deviceId}`);
           }

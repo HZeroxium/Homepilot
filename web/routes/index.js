@@ -7,10 +7,13 @@ import devicesRoutes from "./devices.js";
 import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+import chatbotRoutes from "./chatbot.js";
 
+// Other routes
 router.use("/", authRoutes);
 router.use("/dashboard", ensureAuthenticated, dashboardRoutes);
 router.use("/devices", ensureAuthenticated, devicesRoutes);
+router.use("/chatbot", ensureAuthenticated, chatbotRoutes);
 
 // Handle non-existent routes
 router.use((req, res) => {
