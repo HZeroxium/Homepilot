@@ -2,17 +2,13 @@
 
 import mqttClient from "../config/mqttConfig.js";
 import Device from "../models/deviceModel.js";
-import nodemailer from "nodemailer";
+import sendDevicesNotification from "../utils/sendDevicesNotification.js";
+import sendEmail from "../utils/sendEmail.js";
+import dotenv from 'dotenv';
 
-// Configure Nodemailer
-const transporter = nodemailer.createTransport({
-  service: "Gmail", // Or the email service you use
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+dotenv.config();
 
+let lastNotificationTime = 0;
 /**
  * Handles MQTT messages from devices.
  * @param {Object} io - The Socket.IO server.
@@ -32,9 +28,6 @@ const mqttController = (io) => {
       const payload = JSON.parse(message.toString());
       const [home, userId, deviceType, deviceId, messageType] =
         topic.split("/");
-
-      console.log(`Received message from ${deviceType}:`, payload);
-      console.log(`Message type: ${messageType}`);
 
       if (messageType === "data") {
         /**
@@ -60,9 +53,26 @@ const mqttController = (io) => {
              * Checks if the temperature and humidity levels are unsafe and sends an email if so.
              */
             if (deviceData.temperature > 50 || deviceData.humidity > 80) {
-              /**
-               * Sends an email to the user.
-               */
+              const currentTime = Date.now();
+              if (currentTime - lastNotificationTime >= 10 * 60 * 1000) {
+                // Send notification to user's phone
+                await sendDevicesNotification({
+                  message:"Alert! Temperature or humidity is too high", 
+                  title:"Notification", 
+                  deviceId:process.env.PUSHSAFER_DEVICE_ID
+                });
+                
+                // Send email to user
+                await sendEmail({
+                  to:process.env.EMAIL_RECEIVER, 
+                  from:process.env.EMAIL_SENDER, 
+                  subject:'[HOMEPILOT] NOTIFICATION', 
+                  text:'HomePilot Notification', // Plain text fallback
+                  device_name: "Fire and Smoke System",
+                  temperature: deviceData.temperature,
+                });
+                lastNotificationTime = currentTime;
+              }
               console.log("Alert! Temperature or humidity is too high");
               deviceData.alertStatus = true;
             }
@@ -75,11 +85,10 @@ const mqttController = (io) => {
               light: deviceData.light || 0,
               alertStatus: deviceData.alertStatus ? "Danger" : "Normal",
             }
-            console.log(historicalData)
 
             await device.saveHistoricalData(historicalData);
 
-            console.log(`Saved historical data for device ${deviceId}`);
+            // console.log(`Saved historical data for device ${deviceId}`);
           }
 
           /**

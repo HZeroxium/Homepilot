@@ -1,5 +1,7 @@
-require('dotenv').config();
-const sgMail = require('@sendgrid/mail');
+import dotenv from 'dotenv';
+import sgMail from '@sendgrid/mail';
+
+dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -11,33 +13,17 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
  * @param {string} subject  - The subject of the email.
  * @param {string} text     - The plain text content of the email.
  * @param {string} html     - The HTML content of the email.
- */
-const sendEmail = async (to, from, subject, text, html) => {
-  const msg = {
-    to,
-    from,
-    subject,
-    text,
-    html,
-  };
-
-  try {
-    await sgMail.send(msg);
-    console.log('Email sent');
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
-};
-
+*/
 const url = 'https://localhost:3000';
 
-const htmlTemplate = `
+const sendEmail = async ({to, from, subject, text, device_name, temperature}) => {
+  const htmlTemplate = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HomePilot Notification</title>
+  <title>Temperature Alert</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -54,7 +40,7 @@ const htmlTemplate = `
       overflow: hidden;
     }
     .header {
-      background-color: #0078d7;
+      background-color: #e74c3c;
       color: #ffffff;
       padding: 20px;
       text-align: center;
@@ -71,7 +57,7 @@ const htmlTemplate = `
     .content h2 {
       margin: 0 0 10px;
       font-size: 20px;
-      color: #0078d7;
+      color: #e74c3c;
     }
     .device-status {
       background-color: #f9f9f9;
@@ -79,6 +65,14 @@ const htmlTemplate = `
       border-radius: 8px;
       margin: 15px 0;
       border: 1px solid #e0e0e0;
+    }
+    .alert {
+      background-color: #f2dede;
+      color: #a94442;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 1px solid #ebccd1;
     }
     .button-container {
         text-align: center;
@@ -89,13 +83,13 @@ const htmlTemplate = `
         display: inline-block;
         padding: 10px 20px;
         color: #ffffff;
-        background-color: #0078d7;
+        background-color: #e74c3c;
         text-decoration: none;
         border-radius: 4px;
     }
 
     .button:hover {
-        background-color: #005bb5;
+        background-color: #c0392b;
     }
     .footer {
       text-align: center;
@@ -105,7 +99,7 @@ const htmlTemplate = `
       color: #777777;
     }
     .footer a {
-      color: #0078d7;
+      color: #e74c3c;
       text-decoration: none;
     }
     .footer a:hover {
@@ -117,27 +111,28 @@ const htmlTemplate = `
   <div class="email-container">
     <!-- Header -->
     <div class="header">
-      <h1>HomePilot</h1>
-      <p>Your Smart Home Assistant</p>
+      <h1>Temperature Alert</h1>
+      <p>Warning: High Temperature Detected!</p>
     </div>
 
     <!-- Content -->
     <div class="content">
-      <h2>Notification for Your Smart Home</h2>
+      <h2>Urgent: Temperature Too High</h2>
       <p>Dear User,</p>
-      <p>We wanted to inform you about the latest updates regarding your smart home devices:</p>
+      <p>We are notifying you that the temperature in your smart home is too high. Please take action to prevent any potential damage or discomfort:</p>
       
       <!-- Device Status Section -->
       <div class="device-status">
-        <p><strong>Device:</strong> Living Room Thermostat</p>
-        <p><strong>Status:</strong> Temperature set to 22°C</p>
+        <p><strong>Device:</strong> ${device_name}</p>
+        <p><strong>Status:</strong> Temperature is ${temperature}°C (High Alert)</p>
       </div>
-      <div class="device-status">
-        <p><strong>Device:</strong> Front Door Lock</p>
-        <p><strong>Status:</strong> Locked</p>
+
+      <!-- Alert Message -->
+      <div class="alert">
+        <p><strong>Alert:</strong> The temperature is dangerously high. Immediate action is recommended.</p>
       </div>
       
-      <p>If you didn’t initiate these actions, please check your HomePilot app immediately for further details.</p>
+      <p>If you didn’t initiate these changes, please check your HomePilot app immediately for further details.</p>
 
       <!-- Call to Action -->
       <div class="button-container">
@@ -155,6 +150,22 @@ const htmlTemplate = `
 </body>
 </html>
 `;
+  const html = htmlTemplate;
+  const msg = {
+    to,
+    from,
+    subject,
+    text,
+    html,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log('Email sent');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
 
 // Send the email example
 // sendEmail(
@@ -165,4 +176,4 @@ const htmlTemplate = `
 //   html=htmlTemplate // HTML content
 // );
 
-module.exports = { sendEmail };
+export default sendEmail;
