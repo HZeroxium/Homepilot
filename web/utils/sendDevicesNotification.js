@@ -1,5 +1,7 @@
-require('dotenv').config();
-const Push = require('pushsafer-notifications');
+import dotenv from 'dotenv';
+import Push from 'pushsafer-notifications';
+
+dotenv.config();
 
 /**
  * Sends a push notification using Pushsafer.
@@ -9,7 +11,7 @@ const Push = require('pushsafer-notifications');
  * @param {string} [deviceId=process.env.PUSHSAFER_DEVICE_ID] - The target device ID (optional).
  * @returns {Promise<object>} A promise that resolves with the result of the notification or rejects with an error.
  */
-function sendPushNotification(message, title = "Notification", deviceId = process.env.PUSHSAFER_DEVICE_ID) {
+async function sendDevicesNotification({message, title = "Notification", deviceId = process.env.PUSHSAFER_DEVICE_ID}) {
     // Initialize Pushsafer with the private key
     const pushClient = new Push({
         k: process.env.PUSHSAFER_PRIVATE_KEY, // Private key from .env file
@@ -42,4 +44,4 @@ function sendPushNotification(message, title = "Notification", deviceId = proces
 }
 
 // Export the function
-module.exports = { sendPushNotification };
+export default sendDevicesNotification;
