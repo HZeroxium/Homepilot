@@ -110,12 +110,13 @@ void MQTTManager::publishData(const char *method, const char *status)
 {
   Serial.println("Publishing data to MQTT");
   JsonDocument doc;
-  doc["data"].to<JsonObject>()["method"] = method;
-  doc["status"] = status;
-  doc["temperature"] = system->readTemperature();
-  doc["humidity"] = system->readHumidity();
-  doc["light"] = system->readLightLevel();
-  doc["alertStatus"] = system->checkAlert();
+  JsonObject data = doc["data"].to<JsonObject>();
+  data["method"] = method;
+  data["status"] = status;
+  data["temperature"] = system->readTemperature();
+  data["humidity"] = system->readHumidity();
+  data["light"] = system->readLightLevel();
+  data["alertStatus"] = system->checkAlert();
 
   char jsonBuffer[256];
   serializeJson(doc, jsonBuffer);
