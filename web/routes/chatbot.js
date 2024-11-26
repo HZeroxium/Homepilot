@@ -1,9 +1,10 @@
 // routes/chatbot.js
+
 import express from "express";
-const router = express.Router();
 import chatbotController from "../controllers/chatbotController.js";
 import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
+const router = express.Router();
 router.use(ensureAuthenticated);
 
 router.get("/", chatbotController.getChatbotPage);

@@ -4,10 +4,10 @@ import express from "express";
 import authRoutes from "./auth.js";
 import dashboardRoutes from "./dashboard.js";
 import devicesRoutes from "./devices.js";
+import chatbotRoutes from "./chatbot.js";
 import { ensureAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
-import chatbotRoutes from "./chatbot.js";
 
 // Other routes
 router.use("/", authRoutes);
