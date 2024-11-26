@@ -1,15 +1,16 @@
-import Groq from "groq-sdk";
-import dotenv from "dotenv";
+import Groq from 'groq-sdk';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-async function getGroqChatCompletion(message, model, tools = null, additional = null) {
-    let messages =  [
-            {
-                role: "system",
-                content: `Bạn là một chatbot chuyên trả lời các câu hỏi về hệ thống IOT. Một chút thông tin về hệ thống Homepilot:
+class ChatbotService {
+  static async getCompletion(message, model, tools = null, additional = null) {
+    let messages = [
+      {
+        role: 'system',
+        content: `Bạn là một chatbot chuyên trả lời các câu hỏi về hệ thống IOT. Một chút thông tin về hệ thống Homepilot:
         Homepilot – một hệ thống an ninh thông minh tích hợp cho các môi trường cần bảo mật cao như nhà ở, văn phòng, và cửa hàng. Hệ thống Homepilot cung cấp các chức năng chính bao gồm:
 • Phát hiện xâm nhập: Sử dụng cảm biến chuyển động và khoảng cách để phát hiện những hoạt động bất thường hoặc mở cửa trái phép.
 • Cảnh báo cháy và khói: Theo dõi nhiệt độ và độ ẩm, giúp phát hiện sớm các dấu hiệu cháy nổ.
@@ -20,18 +21,21 @@ Các hệ thống này không chỉ đảm bảo an toàn mà còn hỗ trợ th
 Hệ thống homepilot được phát triển bởi nhóm sinh viên trường Đại học Khoa Học Tự Nhiên Tp.HCM, trong đó có bạn Huỳnh Cao Tuấn Kiệt, Lê Duy Anh, Nguyễn Gia Huy và giáo viên hướng dẫn là thầy Cao Xuân Nam. Thầy Cao Xuân Nam đã tận tình hướng dẫn và giúp đỡ nhóm sinh viên trong quá trình thực hiện dự án.
 Note: Chỉ trả lời các câu hỏi liên quan đến hệ thống IOT, các yêu cầu về thông tin thiết bị(nhiệt độ, độ ẩm...) thì cho phép, nhưng các yêu cầu khác không liên quan thì từ chối. Đưa ra câu trả lời theo đoạn, bắt buộc trả lời bằng tiếng việt.
 `,
-            },
-            {
-                role: "user",
-                content: message,
-            },
-        ];
-    if (additional !== null) {
-        messages = [...messages, additional];
-        return groq.chat.completions.create({messages: messages, model: model});
-    }
-    const respond = await groq.chat.completions.create({messages: messages, model: model, tools: tools});
-    return respond;
+      },
+      {
+        role: 'user',
+        content: message,
+      },
+    ];
+
+    if (additional) messages.push(additional);
+
+    return await groq.chat.completions.create({
+      messages,
+      model,
+      tools,
+    });
+  }
 }
 
-export { getGroqChatCompletion };
+export default ChatbotService;

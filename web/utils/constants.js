@@ -1,24 +1,18 @@
-import dotenv from 'dotenv';
-import sgMail from '@sendgrid/mail';
+// utils/constants.js
 
-dotenv.config();
+export const tools = [
+  {
+    type: 'function',
+    function: {
+      name: 'getTemperatureAndHumidityAndLight',
+      description:
+        'Truy vấn (nhiệt độ(C), độ sáng(lux), độ ẩm(%), mức độ cảnh báo) hiện tại thông qua hệ thống fire_smoke nhờ vào cảm biến.',
+    },
+  },
+];
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-/**
- * Sends an email using SendGrid.
- * 
- * @param {string} to       - The recipient's email address.
- * @param {string} from     - The sender's verified email address.
- * @param {string} subject  - The subject of the email.
- * @param {string} text     - The plain text content of the email.
- * @param {string} html     - The HTML content of the email.
-*/
-const url = 'https://localhost:3000';
-
-const sendEmail = async ({to, from, subject, text, device_name, temperature}) => {
-  const htmlTemplate = `
-<!DOCTYPE html>
+export const getHTMLTemplate = (device_name, temperature, url) => {
+  return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -150,30 +144,9 @@ const sendEmail = async ({to, from, subject, text, device_name, temperature}) =>
 </body>
 </html>
 `;
-  const html = htmlTemplate;
-  const msg = {
-    to,
-    from,
-    subject,
-    text,
-    html,
-  };
-
-  try {
-    await sgMail.send(msg);
-    console.log('Email sent');
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
 };
 
-// Send the email example
-// sendEmail(
-//   to='hctuankiet243@gmail.com', 
-//   from='hctkiet22@clc.fitus.edu.vn', 
-//   subject='[HOMEPILOT] NOTIFICATION', 
-//   text='HomePilot Notification', // Plain text fallback
-//   html=htmlTemplate // HTML content
-// );
-
-export default sendEmail;
+export default {
+  tools,
+  getHTMLTemplate,
+};

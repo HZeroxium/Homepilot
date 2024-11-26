@@ -14,8 +14,8 @@ function ensureAuthenticated(req, res, next) {
   }
 
   // User is not authenticated, so flash an error message and redirect to login
-  req.flash("error_msg", "Please log in to continue.");
-  res.redirect("/login");
+  req.flash('error_msg', 'Please log in to continue.');
+  res.redirect('/login');
 }
 
 /**
@@ -32,7 +32,7 @@ function forwardAuthenticated(req, res, next) {
   }
 
   // User is authenticated, so forward them to the dashboard
-  res.redirect("/dashboard");
+  res.redirect('/dashboard');
 }
 
 export { ensureAuthenticated, forwardAuthenticated };

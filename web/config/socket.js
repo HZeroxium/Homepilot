@@ -1,6 +1,6 @@
 // config/socket.js
 
-import { Server as socketIO } from "socket.io";
+import { Server as socketIO } from 'socket.io';
 
 let io;
 
@@ -21,7 +21,7 @@ export const init = (server) => {
  */
 export const getIO = () => {
   if (!io) {
-    throw new Error("Socket.io not initialized!");
+    throw new Error('Socket.io not initialized!');
   }
   return io;
 };
