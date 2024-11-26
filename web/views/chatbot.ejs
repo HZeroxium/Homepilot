@@ -136,7 +136,11 @@
       const message = userMessageInput.value.trim();
       if (message) {
         // Send user message to the server
-        socket.emit("chatMessage", message);
+        // console.log("Req: ", req.session);
+        socket.emit("chatMessage", {
+          message:message,
+          userID: "<%= userID %>"
+        });
 
         // Add user message to the chat UI
         const userMessage = document.createElement("div");
