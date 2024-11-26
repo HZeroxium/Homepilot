@@ -2,7 +2,7 @@
 
 import ChatbotService from './chatbot.service.js';
 import DeviceService from './device.service.js';
-import convertTimestamp from '../utils/convertTimestamp.js';
+import { convertTimestamp } from '../utils/convertTimeStamp.js';
 
 class SocketService {
   static async processChatMessage({ message, userId }) {

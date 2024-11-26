@@ -1,5 +1,5 @@
 // utils/convertTimestamp.js
-function convertTimestamp(timestamp) {
+export const convertTimestamp = (timestamp) => {
   // Lấy giá trị seconds từ timestamp
   const seconds = timestamp._seconds;
   const nanoseconds = timestamp._nanoseconds;
@@ -17,6 +17,6 @@ function convertTimestamp(timestamp) {
 
   // Kết hợp thành chuỗi định dạng
   return `${hours}:${minutes}:${secondsPart} ${day}/${month}/${year}`;
-}
+};
 
-export default convertTimestamp;
+export default { convertTimestamp };

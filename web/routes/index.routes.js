@@ -1,10 +1,10 @@
 // routes/index.route.js
 
 import express from 'express';
-import authRoutes from './auth.route.js';
-import dashboardRoutes from './dashboard.route.js';
-import devicesRoutes from './devices.route.js';
-import chatbotRoutes from './chatbot.route.js';
+import authRoutes from './auth.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
+import devicesRoutes from './devices.routes.js';
+import chatbotRoutes from './chatbot.routes.js';
 import { ensureAuthenticated } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();

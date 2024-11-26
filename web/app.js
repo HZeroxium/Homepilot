@@ -6,7 +6,7 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import http from 'http';
 import { appConfig } from './config/appConfig.js';
-import routes from './routes/index.route.js';
+import routes from './routes/index.routes.js';
 import mqttController from './controllers/mqtt.controller.js';
 import sharedsession from 'express-socket.io-session';
 import { fileURLToPath } from 'url';
