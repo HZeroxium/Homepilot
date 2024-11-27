@@ -1,40 +1,65 @@
 <!-- views/index.ejs -->
 <% title = 'Home' %>
 
-<main class="container mx-auto px-4 py-8">
+<main class="container my-5">
   <div class="text-center">
-    <h1 class="text-4xl font-bold text-primary mb-4">Chào mừng đến với IoT Dashboard</h1>
-    <p class="text-lg text-gray-700 mb-6">
+    <h1 class="display-4 text-primary mb-4">
+      <i class="bi bi-house-door-fill"></i> Chào mừng đến với IoT Dashboard
+    </h1>
+    <p class="lead text-muted mb-4">
       Quản lý và giám sát hệ thống IoT của bạn một cách dễ dàng và hiệu quả.
     </p>
     <% if (!user) { %>
-      <a href="/register" class="btn btn-primary mx-2">Đăng Ký</a>
-      <a href="/login" class="btn btn-secondary mx-2">Đăng Nhập</a>
+      <a href="/register" class="btn btn-primary mx-2">
+        <i class="bi bi-person-plus-fill"></i> Đăng Ký
+      </a>
+      <a href="/login" class="btn btn-outline-secondary mx-2">
+        <i class="bi bi-box-arrow-in-right"></i> Đăng Nhập
+      </a>
     <% } else { %>
-      <a href="/dashboard" class="btn btn-primary">Đi đến Dashboard</a>
+      <a href="/dashboard" class="btn btn-success">
+        <i class="bi bi-speedometer2"></i> Đi đến Dashboard
+      </a>
     <% } %>
   </div>
-  <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+  <!-- Cards Section -->
+  <div class="row mt-5 g-4">
     <!-- Card 1 -->
-    <div class="card">
-      <h3 class="card-title">Giám Sát Thời Gian Thực</h3>
-      <p class="card-content">
-        Theo dõi trạng thái các thiết bị IoT của bạn ngay lập tức, mọi lúc mọi nơi.
-      </p>
+    <div class="col-md-4">
+      <div class="card h-100 text-center shadow-sm">
+        <div class="card-body">
+          <i class="bi bi-eye-fill text-primary display-4 mb-3"></i>
+          <h5 class="card-title text-primary">Giám Sát Thời Gian Thực</h5>
+          <p class="card-text">
+            Theo dõi trạng thái các thiết bị IoT của bạn ngay lập tức, mọi lúc mọi nơi.
+          </p>
+        </div>
+      </div>
     </div>
     <!-- Card 2 -->
-    <div class="card">
-      <h3 class="card-title">Quản Lý Thiết Bị Dễ Dàng</h3>
-      <p class="card-content">
-        Thêm, xóa và điều khiển các thiết bị IoT một cách thuận tiện.
-      </p>
+    <div class="col-md-4">
+      <div class="card h-100 text-center shadow-sm">
+        <div class="card-body">
+          <i class="bi bi-gear-fill text-primary display-4 mb-3"></i>
+          <h5 class="card-title text-primary">Quản Lý Thiết Bị Dễ Dàng</h5>
+          <p class="card-text">
+            Thêm, xóa và điều khiển các thiết bị IoT một cách thuận tiện.
+          </p>
+        </div>
+      </div>
     </div>
     <!-- Card 3 -->
-    <div class="card">
-      <h3 class="card-title">Bảo Mật Cao</h3>
-      <p class="card-content">
-        Đảm bảo an toàn cho dữ liệu và thiết bị của bạn với hệ thống bảo mật tiên tiến.
-      </p>
+    <div class="col-md-4">
+      <div class="card h-100 text-center shadow-sm">
+        <div class="card-body">
+          <i class="bi bi-shield-lock-fill text-primary display-4 mb-3"></i>
+          <h5 class="card-title text-primary">Bảo Mật Cao</h5>
+          <p class="card-text">
+            Đảm bảo an toàn cho dữ liệu và thiết bị của bạn với hệ thống bảo mật tiên tiến.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </main>

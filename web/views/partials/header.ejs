@@ -1,17 +1,29 @@
 <!-- views/partials/header.ejs -->
-<header class="bg-white shadow">
-  <div class="container mx-auto px-4 py-2 flex justify-between items-center">
-    <a href="/" class="text-2xl font-bold text-primary">IoT Dashboard</a>
-    <div class="flex items-center">
-      <form action="/search" method="GET" class="hidden md:block">
-        <input
-          type="text"
-          name="q"
-          placeholder="Tìm kiếm..."
-          class="border rounded p-1"
-        />
-      </form>
-      <!-- Có thể thêm các icon hoặc nút khác -->
-    </div>
+<header class="bg-light shadow-sm py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <!-- Website Logo -->
+    <a
+      href="/"
+      class="text-decoration-none text-primary d-flex align-items-center"
+    >
+      <i class="bi bi-tools fs-3 me-2"></i>
+      <!-- Bootstrap Icon for logo -->
+      <span class="fs-5 fw-bold">IoT Dashboard</span>
+    </a>
+
+    <!-- Search Bar -->
+    <form class="d-flex" action="/search" method="GET">
+      <input
+        class="form-control me-2"
+        type="search"
+        name="q"
+        placeholder="Search devices..."
+        aria-label="Search"
+      />
+      <button class="btn btn-outline-primary" type="submit">
+        <i class="bi bi-search"></i>
+        <!-- Bootstrap Icon for search -->
+      </button>
+    </form>
   </div>
 </header>

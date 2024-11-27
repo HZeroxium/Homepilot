@@ -2,29 +2,27 @@
 
 <% title = 'Hệ Thống Kiểm Soát Truy Cập' %>
 
-<main class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold text-primary mb-4">
-    Quản Lý Hệ Thống Kiểm Soát Truy Cập
+<main class="container mt-5">
+  <h2 class="text-primary mb-4">
+    <i class="bi bi-door-closed"></i> Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
-  <p class="mb-4">
+  <p>
     Trạng thái cửa:
-    <span class="font-semibold"
-      ><%= device.data.doorStatus || 'Unknown' %></span
-    >
+    <span class="fw-bold"><%= device.data.doorStatus || 'Unknown' %></span>
   </p>
   <form
     action="/devices/access_control/action"
     method="POST"
-    class="flex space-x-4 mb-4"
+    class="d-flex gap-3 mb-4"
   >
     <button type="submit" name="action" value="unlock" class="btn btn-primary">
-      Mở Khóa
+      <i class="bi bi-unlock"></i> Mở Khóa
     </button>
     <button type="submit" name="action" value="lock" class="btn btn-secondary">
-      Khóa
+      <i class="bi bi-lock-fill"></i> Khóa
     </button>
   </form>
-  <a href="/devices/access_control/change_password" class="btn btn-secondary">
-    Thay Đổi Mật Khẩu
+  <a href="/devices/access_control/change_password" class="btn btn-warning">
+    <i class="bi bi-key"></i> Thay Đổi Mật Khẩu
   </a>
 </main>

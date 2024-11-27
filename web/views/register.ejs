@@ -1,58 +1,78 @@
 <!-- views/register.ejs -->
-<% title = 'Đăng Ký' %>
+<% title = 'Đăng Ký' %> <% title = 'Đăng Ký' %>
 
-<main class="container mx-auto px-4">
-  <h2 class="text-2xl font-bold text-primary mb-4">Đăng Ký</h2>
+<main class="container my-5">
+  <h2 class="text-primary text-center mb-4">
+    <i class="bi bi-person-plus-fill"></i> Đăng Ký
+  </h2>
   <form
     action="/register"
     method="POST"
-    class="max-w-md mx-auto bg-white shadow p-6 rounded"
+    class="mx-auto bg-light shadow p-4 rounded"
+    style="max-width: 400px"
   >
-    <div class="mb-4">
-      <label for="displayName" class="block text-gray-700">Tên hiển thị:</label>
+    <div class="mb-3">
+      <label for="displayName" class="form-label"
+        ><i class="bi bi-person"></i> Tên hiển thị:</label
+      >
       <input
         type="text"
         name="displayName"
         id="displayName"
         required
-        class="w-full mt-1 p-2 border rounded"
+        class="form-control"
+        placeholder="Nhập tên hiển thị của bạn"
       />
     </div>
-    <div class="mb-4">
-      <label for="email" class="block text-gray-700">Email:</label>
+
+    <div class="mb-3">
+      <label for="email" class="form-label"
+        ><i class="bi bi-envelope"></i> Email:</label
+      >
       <input
         type="email"
         name="email"
         id="email"
         required
-        class="w-full mt-1 p-2 border rounded"
+        class="form-control"
+        placeholder="Nhập email của bạn"
       />
     </div>
-    <div class="mb-4">
-      <label for="password" class="block text-gray-700">Mật khẩu:</label>
+
+    <div class="mb-3">
+      <label for="password" class="form-label"
+        ><i class="bi bi-lock"></i> Mật khẩu:</label
+      >
       <input
         type="password"
         name="password"
         id="password"
         required
-        class="w-full mt-1 p-2 border rounded"
+        class="form-control"
+        placeholder="Nhập mật khẩu của bạn"
       />
     </div>
-    <div class="mb-4">
-      <label for="confirmPassword" class="block text-gray-700"
-        >Xác nhận mật khẩu:</label
+
+    <div class="mb-3">
+      <label for="confirmPassword" class="form-label"
+        ><i class="bi bi-lock"></i> Xác nhận mật khẩu:</label
       >
       <input
         type="password"
         name="confirmPassword"
         id="confirmPassword"
         required
-        class="w-full mt-1 p-2 border rounded"
+        class="form-control"
+        placeholder="Xác nhận mật khẩu của bạn"
       />
     </div>
-    <button type="submit" class="btn btn-primary w-full">Đăng Ký</button>
+
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="bi bi-person-plus"></i> Đăng Ký
+    </button>
   </form>
-  <p class="text-center mt-4">
-    Bạn đã có tài khoản? <a href="/login" class="text-primary">Đăng nhập</a>
+  <p class="text-center mt-3">
+    Bạn đã có tài khoản?
+    <a href="/login" class="text-decoration-none text-primary">Đăng nhập</a>
   </p>
 </main>

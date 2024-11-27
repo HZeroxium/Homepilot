@@ -2,82 +2,107 @@
 
 <% title = 'Hệ Thống Cảnh Báo Cháy và Khói' %>
 
-<main class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold text-primary mb-4">Quản Lý Hệ Thống Cảnh Báo Cháy và Khói</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-white p-4 shadow rounded">
-      <p>Nhiệt độ: <span class="font-semibold"><%= historicalData[historicalData.length - 1].temperature %>°C</span></p>
-      <p>Độ ẩm: <span class="font-semibold"><%= historicalData[historicalData.length - 1].humidity %>%</span></p>
-    </div>
-    <div class="bg-white p-4 shadow rounded">
-      <p>Trạng thái cảnh báo: <span class="font-semibold"><%= historicalData[historicalData.length - 1].alertStatus %></span></p>
-      <!-- Hiển thị thông báo nếu có cảnh báo -->
-      <% if (historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
-        <div class="alert alert-error mt-4">
-          Cảnh báo! Phát hiện khói hoặc lửa.
+<main class="container mt-5">
+  <h2 class="text-primary mb-4">
+    <i class="bi bi-fire"></i> Quản Lý Hệ Thống Cảnh Báo Cháy và Khói
+  </h2>
+
+  <div class="row g-4">
+    <!-- Temperature and Humidity -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-thermometer"></i> Nhiệt độ</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].temperature %>°C</span>
+          </p>
+          <h5 class="card-title"><i class="bi bi-droplet"></i> Độ ẩm</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].humidity %>%</span>
+          </p>
         </div>
-      <% } %>
+      </div>
+    </div>
+
+    <!-- Alert Status -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Trạng Thái Cảnh Báo</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].alertStatus %></span>
+          </p>
+          <% if (historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
+            <div class="alert alert-danger mt-3">
+              <i class="bi bi-exclamation-circle"></i> Cảnh báo! Phát hiện khói hoặc lửa.
+            </div>
+          <% } %>
+        </div>
+      </div>
     </div>
   </div>
-  <canvas id="tempHumidityChart" width="400" height="200"></canvas>
+
+  <!-- Chart Section -->
+  <div class="mt-5">
+    <h5 class="text-primary mb-3"><i class="bi bi-graph-up"></i> Biểu Đồ Nhiệt Độ và Độ Ẩm</h5>
+    <canvas id="tempHumidityChart" width="400" height="200" class="shadow-sm"></canvas>
+  </div>
 </main>
 
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Thay thế dòng sau -->
 <script src="/socket.io/socket.io.js"></script>
-
-<!-- Bằng dòng sau sử dụng CDN -->
-<!-- <script
-  src="https://cdn.socket.io/4.5.4/socket.io.min.js"
-  integrity="sha384-HY1Nmeyp81rtd9xnjD6uRAtfJfOp7xygHKIVJ1AiYpH+B6iMIf1PbJ5VclGDV30L"
-  crossorigin="anonymous"
-></script> -->
-
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     console.log("Device UID: <%= device.uid %>");
 
-    // Kết nối đến server Socket.io
+    // Connect to Socket.io
     const socket = io();
 
     socket.on("connect", () => {
       console.log("Connected to Socket.io server.");
-      console.log("Socket ID:", socket.id);
     });
 
     socket.on("connect_error", (err) => {
       console.error("Connection Error:", err.message);
     });
 
-    // Gửi yêu cầu tham gia room với userId
+    // Join room with userId
     socket.emit("joinRoom", { userId: "<%= user.id %>" });
-    // Dữ liệu ban đầu cho biểu đồ
+
+    // Initialize chart data
     const data = {
-      labels: [], // Thời gian
+      labels: [], // Time
       datasets: [
         {
           label: 'Nhiệt độ (°C)',
           data: [],
           borderColor: 'rgb(255, 99, 132)',
-          fill: false,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          fill: true,
         },
         {
           label: 'Độ ẩm (%)',
           data: [],
           borderColor: 'rgb(54, 162, 235)',
-          fill: false,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: true,
         },
       ],
     };
 
-    // Cấu hình biểu đồ
+    // Chart configuration
     const config = {
       type: 'line',
       data: data,
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+        },
         scales: {
           x: {
             display: true,
@@ -97,11 +122,11 @@
       },
     };
 
-    // Khởi tạo biểu đồ
+    // Initialize Chart.js
     const ctx = document.getElementById('tempHumidityChart').getContext('2d');
     const tempHumidityChart = new Chart(ctx, config);
 
-    // Khởi tạo dữ liệu từ historicalData
+    // Populate chart with historical data
     const historicalData = <%- JSON.stringify(historicalData || []) %>;
     historicalData.forEach(dataPoint => {
       const timestamp = new Date(dataPoint.timestamp._seconds * 1000).toLocaleTimeString();
@@ -112,21 +137,20 @@
 
     tempHumidityChart.update();
 
-    // Lắng nghe sự kiện từ server
+    // Listen for real-time updates
     socket.on('deviceDataUpdate', (data) => {
-      console.log("Received data from server(fire smoke.ejs):", data);
-      console.log("Data(fire smoke.ejs): ", data);
+      console.log("Received data from server:", data);
       if (data.deviceType === 'fire_smoke' && data.deviceId === '<%= device.uid %>') {
         const timestamp = new Date().toLocaleTimeString();
         const temperature = data.data.temperature;
         const humidity = data.data.humidity;
 
-        // Cập nhật dữ liệu biểu đồ
+        // Update chart
         tempHumidityChart.data.labels.push(timestamp);
         tempHumidityChart.data.datasets[0].data.push(temperature);
         tempHumidityChart.data.datasets[1].data.push(humidity);
 
-        // Giới hạn số lượng điểm dữ liệu
+        // Limit data points
         if (tempHumidityChart.data.labels.length > 20) {
           tempHumidityChart.data.labels.shift();
           tempHumidityChart.data.datasets[0].data.shift();
@@ -138,3 +162,4 @@
     });
   });
 </script>
+

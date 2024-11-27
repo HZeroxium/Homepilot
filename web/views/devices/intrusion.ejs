@@ -1,16 +1,15 @@
 <!-- views/devices/intrusion.ejs -->
 
 <% title = 'Hệ Thống Phát Hiện Xâm Nhập' %>
-<main class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold text-primary mb-4">
-    Quản Lý Hệ Thống Phát Hiện Xâm Nhập
+
+<main class="container mt-5">
+  <h2 class="text-primary mb-4">
+    <i class="bi bi-shield-lock"></i> Quản Lý Hệ Thống Phát Hiện Xâm Nhập
   </h2>
-  <p class="mb-4">
-    Trạng thái hiện tại: <span class="font-semibold"><%= device.status %></span>
-  </p>
-  <form action="/devices/intrusion/action" method="POST" class="flex space-x-4">
+  <p>Trạng thái hiện tại: <span class="fw-bold"><%= device.status %></span></p>
+  <form action="/devices/intrusion/action" method="POST" class="d-flex gap-3">
     <button type="submit" name="action" value="arm" class="btn btn-primary">
-      Kích hoạt
+      <i class="bi bi-shield"></i> Kích Hoạt
     </button>
     <button
       type="submit"
@@ -18,7 +17,7 @@
       value="disarm"
       class="btn btn-secondary"
     >
-      Vô hiệu hóa
+      <i class="bi bi-shield-x"></i> Vô Hiệu Hóa
     </button>
   </form>
 </main>
