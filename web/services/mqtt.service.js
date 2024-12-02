@@ -30,6 +30,11 @@ class MqttService {
       await this.handleFireSmokeDevice(device, deviceData, userId);
     }
 
+    // Handle intrusion devices
+    if (device.type === 'intrusion') {
+      await this.handleIntrusionDevice(device, deviceData, userId);
+    }
+
     return { device, deviceType, deviceData, userId };
   }
 
@@ -66,6 +71,39 @@ class MqttService {
       temperature,
       humidity,
       light: deviceData.light || 0,
+      alertStatus: deviceData.alertStatus ? 'Danger' : 'Normal',
+    };
+    await device.saveHistoricalData(historicalData);
+  }
+
+  static async handleIntrusionDevice(device, deviceData, userId) {
+    const { distance = 0, motion = false } = deviceData;
+
+    const safeDistance = 20;
+
+    // Check for motion and send notifications
+    if (motion && distance <= safeDistance) {
+      await NotificationService.sendDevicesNotification({
+        message: 'Alert! Motion detected',
+        title: 'Notification',
+        deviceId: process.env.PUSHSAFER_DEVICE_ID,
+      });
+
+      await NotificationService.sendEmail({
+        to: process.env.EMAIL_RECEIVER,
+        from: process.env.EMAIL_SENDER,
+        subject: '[HOMEPILOT] NOTIFICATION',
+        text: 'Motion detected!',
+        device_name: device.name,
+      });
+      console.log('Alert! Motion detected');
+      deviceData.alertStatus = true;
+    }
+
+    // Save historical data
+    const historicalData = {
+      distance,
+      motion,
       alertStatus: deviceData.alertStatus ? 'Danger' : 'Normal',
     };
     await device.saveHistoricalData(historicalData);

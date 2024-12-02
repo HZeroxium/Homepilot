@@ -13,8 +13,8 @@ class DeviceService {
   }
 
   static async createDevice(userId, type, name) {
-    const device = await Device.createDevice(userId, type, name);
-    await device.logActivity('added', userId);
+    const device = await Device.create(userId, type, name);
+    // await device.logActivity('added', userId);
     return device;
   }
 
@@ -65,7 +65,9 @@ class DeviceService {
     }
 
     const temperatureDevices = devices.filter((d) => d.type === 'fire_smoke');
-    const data = await Promise.all(
+    const intrusionDevices = devices.filter((d) => d.type === 'intrusion');
+
+    const fireSmokeData = await Promise.all(
       temperatureDevices.map(async (device) => {
         const historicalData = await device.getHistoricalData(1);
         return {
@@ -80,7 +82,21 @@ class DeviceService {
       })
     );
 
-    return data;
+    const intrusionData = await Promise.all(
+      intrusionDevices.map(async (device) => {
+        const historicalData = await device.getHistoricalData(1);
+        return {
+          device: device.uid,
+          name: device.name,
+          type: device.type,
+          distance: historicalData[0]?.distance || null,
+          motion: historicalData[0]?.motion || null,
+          timestamp: historicalData[0]?.timestamp || null,
+        };
+      })
+    );
+
+    return [...fireSmokeData, ...intrusionData];
   }
 }
 
