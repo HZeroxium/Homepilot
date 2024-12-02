@@ -14,10 +14,7 @@ const deviceController = {
         return res.redirect('/dashboard');
       }
 
-      const historicalData =
-        device.type === 'fire_smoke'
-          ? await DeviceService.getHistoricalData(device, 20)
-          : [];
+      const historicalData = await DeviceService.getHistoricalData(device, 20);
 
       res.render(`devices/${deviceType}`, {
         device,

@@ -19,17 +19,16 @@ Led led(LED_PIN);
 Buzzer buzzer(BUZZER_PIN, 500);
 OLED oled(21, 22);
 MQTTManager mqttManager;
+WiFiManager wifiManager;
+
 // Instantiate system
 IntrusionSystem intrusionSystem(motion, led, buzzer, oled, ultrasonic, distanceThreshold);
 
 void setup() {
     Serial.begin(115200);
-    WiFiManager wifiManager;
-    wifiManager.connect();
-
     intrusionSystem.setup();
+    wifiManager.connect();
     mqttManager.init(wifiManager.getClient(), &intrusionSystem);
-
 }
 
 void loop() {

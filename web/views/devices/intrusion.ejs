@@ -1,23 +1,151 @@
-<!-- views/devices/intrusion.ejs -->
-
-<% title = 'Hệ Thống Phát Hiện Xâm Nhập' %>
+<% title = 'Hệ Thống Cảnh Báo Xâm Nhập' %>
 
 <main class="container mt-5">
   <h2 class="text-primary mb-4">
-    <i class="bi bi-shield-lock"></i> Quản Lý Hệ Thống Phát Hiện Xâm Nhập
+    <i class="bi bi-shield-lock"></i> Quản Lý Hệ Thống Cảnh Báo Xâm Nhập
   </h2>
-  <p>Trạng thái hiện tại: <span class="fw-bold"><%= device.status %></span></p>
-  <form action="/devices/intrusion/action" method="POST" class="d-flex gap-3">
-    <button type="submit" name="action" value="arm" class="btn btn-primary">
-      <i class="bi bi-shield"></i> Kích Hoạt
-    </button>
-    <button
-      type="submit"
-      name="action"
-      value="disarm"
-      class="btn btn-secondary"
-    >
-      <i class="bi bi-shield-x"></i> Vô Hiệu Hóa
-    </button>
-  </form>
+
+  <div class="row g-4">
+    <!-- Distance and Motion -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-rulers"></i> Khoảng cách</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].distance %> cm</span>
+          </p>
+          <h5 class="card-title"><i class="bi bi-activity"></i> Chuyển động</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].motion ? 'Có' : 'Không' %></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Status -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Trạng Thái Cảnh Báo</h5>
+          <p class="card-text">
+            <span class="fw-bold"><%= historicalData[historicalData.length - 1].alertStatus %></span>
+          </p>
+          <% if (historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
+            <div class="alert alert-danger mt-3">
+              <i class="bi bi-exclamation-circle"></i> Cảnh báo! Phát hiện chuyển động bất thường.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="mt-5">
+    <h5 class="text-primary mb-3"><i class="bi bi-graph-up"></i> Biểu Đồ Khoảng Cách</h5>
+    <canvas id="distanceChart" width="400" height="200" class="shadow-sm"></canvas>
+  </div>
 </main>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log("Device UID: <%= device.uid %>");
+
+    // Connect to Socket.io
+    const socket = io();
+
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io server.");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection Error:", err.message);
+    });
+
+    // Join room with userId
+    socket.emit("joinRoom", { userId: "<%= user.id %>" });
+
+    // Initialize chart data
+    const data = {
+      labels: [], // Time
+      datasets: [
+        {
+          label: 'Khoảng cách (cm)',
+          data: [],
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+        },
+      ],
+    };
+
+    // Chart configuration
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+        },
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Thời gian',
+            },
+          },
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Khoảng cách (cm)',
+            },
+          },
+        },
+      },
+    };
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('distanceChart').getContext('2d');
+    const distanceChart = new Chart(ctx, config);
+
+    // Populate chart with historical data
+    const historicalData = <%-JSON.stringify(historicalData || [])%>;
+    historicalData.forEach(dataPoint => {
+      const timestamp = new Date(dataPoint.timestamp._seconds * 1000).toLocaleTimeString();
+      distanceChart.data.labels.push(timestamp);
+      distanceChart.data.datasets[0].data.push(dataPoint.distance);
+    });
+
+    distanceChart.update();
+
+    // Listen for real-time updates
+    socket.on('deviceDataUpdate', (data) => {
+      console.log("Received data from server:", data);
+      if (data.deviceType === 'intrusion' && data.deviceId === '<%= device.uid %>') {
+        const timestamp = new Date().toLocaleTimeString();
+        const distance = data.data.distance;
+
+        // Update chart
+        distanceChart.data.labels.push(timestamp);
+        distanceChart.data.datasets[0].data.push(distance);
+
+        // Limit data points
+        if (distanceChart.data.labels.length > 20) {
+          distanceChart.data.labels.shift();
+          distanceChart.data.datasets[0].data.shift();
+        }
+
+        distanceChart.update();
+      }
+    });
+  });
+</script>

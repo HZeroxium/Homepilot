@@ -23,8 +23,8 @@ private:
   ServoManager *servoManager;
   DisplayManager *displayManager;
   NeoPixelManager *neoPixelManager;
-  const char *data_topic = "home/522e979d-a624-45a1-919f-34e0963cad31/access_control/ZGeBHawqRAeJMPxxWkfI/data";
-  const char *command_topic = "home/522e979d-a624-45a1-919f-34e0963cad31/access_control/ZGeBHawqRAeJMPxxWkfI/command";
+  const char *data_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/access_control/TTMyGZ6wF5kVOoJx0Jqr/data";
+  const char *command_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/access_control/TTMyGZ6wF5kVOoJx0Jqr/command";
   const char *mqtt_server = "test.mosquitto.org";
 
   static void staticCallback(char *topic, byte *payload, unsigned int length); // Static callback
