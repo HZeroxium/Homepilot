@@ -36,12 +36,32 @@ class DeviceService {
     await device.updateStatus(status);
   }
 
-  static async updateDevicePassword(device, newPassword) {
-    await device.updatePassword(newPassword);
+  static async updateDevicePassword(deviceData, newPassword) {
+    // Create a Lock instance using the device data
+    const lock = new Lock(
+      deviceData.uid,
+      deviceData.userId,
+      deviceData.type,
+      deviceData.name,
+      deviceData.status,
+      deviceData.data
+    );
+
+    // Call the updatePassword method
+    await lock.updatePassword(newPassword);
   }
 
   static async updateDeviceDistance(device, distance) {
-    await device.updateDistance(distance);
+    const intrusion = new Intrusion(
+      device.uid,
+      device.userId,
+      device.type,
+      device.name,
+      device.status,
+      device.data
+    );
+
+    await intrusion.updateDistance(distance);
   }
 
   static async publishToDevice(userId, device, action, parameters = {}) {

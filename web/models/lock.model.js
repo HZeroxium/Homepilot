@@ -1,4 +1,7 @@
 import Device from '../models/device.model.js';
+import { db } from '../config/firebaseConfig.js';
+
+const devicesCollection = db.collection('devices'); // Define this at the top of the file
 
 class Lock extends Device {
   constructor(uid, userId, type, name, status = 'offline', data = {}) {

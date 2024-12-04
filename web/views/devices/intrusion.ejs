@@ -191,21 +191,21 @@
             // alert('Khoảng cách đã được cập nhật!');
             // Optionally, you can update the chart or UI with the new distance here
             successMessage.style.display = 'block';
-            alert('good')
+            // alert('good')
           } else {
             errorMessage.style.display = 'block';
-            alert('not good')
+            // alert('not good')
           }
         })
         .catch(error => {
           console.error('Error updating distance:', error);
           errorMessage.style.display = 'block';
-          alert('error')
+          // alert('error')
         });
       } else {
         // Display error message if input is invalid
         errorMessage.style.display = 'block';
-        alert('what')
+        // alert('what')
       }
     });
   });
