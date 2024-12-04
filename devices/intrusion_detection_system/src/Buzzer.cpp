@@ -20,10 +20,10 @@ void Buzzer::update() {
 
 void Buzzer::on() {
     state = true;
-    digitalWrite(pin, HIGH);
+    tone(pin, 1000);
 }
 
 void Buzzer::off() {
     state = false;
-    digitalWrite(pin, LOW);
+    noTone(pin);
 }

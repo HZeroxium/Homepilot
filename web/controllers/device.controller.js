@@ -213,6 +213,36 @@ const deviceController = {
       next(error);
     }
   },
+
+  async postChangeDistance(req, res, next) {
+    const userId = req.session.user.uid;
+    const deviceType = 'intrusion';
+    const { newDistance } = req.body;
+
+    try {
+      const device = await DeviceService.getDeviceByType(userId, deviceType);
+      if (!device) {
+        req.flash('error_msg', 'Device does not exist.');
+        return res.redirect('/dashboard');
+      }
+
+      if (!newDistance || newDistance < 0 || newDistance > 200) {
+        req.flash('error_msg', 'Please provide a valid distance.');
+        return res.redirect('/devices/intrusion');
+      }
+
+      await DeviceService.updateDeviceDistance(device, newDistance);
+      await DeviceService.publishToDevice(userId, device, 'update_distance', {
+        newDistance,
+      });
+
+      req.flash('success_msg', 'Distance updated successfully.');
+      res.redirect('/devices/intrusion');
+    } catch (error) {
+      console.error('Error in postChangeDistance:', error);
+      next(error);
+    }
+  },
 };
 
 export default deviceController;

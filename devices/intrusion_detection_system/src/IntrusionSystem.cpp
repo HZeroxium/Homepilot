@@ -66,6 +66,10 @@ void IntrusionSystem::activate()
 
 void IntrusionSystem::deactivate()
 {
+    // turn off all the components
+    led.off();
+    buzzer.off();
+    
     isActivated = false;
     oled.showMessage("System Deactivated");
 }

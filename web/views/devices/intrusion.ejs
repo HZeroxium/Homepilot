@@ -18,6 +18,23 @@
           <p class="card-text">
             <span class="fw-bold"><%= historicalData[historicalData.length - 1].motion ? 'Có' : 'Không' %></span>
           </p>
+
+          <!-- Input Field and Save Button -->
+          <div class="mt-4">
+            <label for="newDistance" class="form-label">Nhập Khoảng Cách Mới (cm)</label>
+            <input type="number" class="form-control" id="newDistance" placeholder="Nhập khoảng cách mới" required>
+            
+            <!-- Error message (hidden initially) -->
+            <div id="errorMessage" class="mt-2 text-danger" style="display: none;">
+              Khoảng cách không hợp lệ. Vui lòng nhập một giá trị hợp lệ.
+            </div>
+
+            <div id="successMessage" class="mt-2 text-success" style="display: none;">
+              Khoảng cách đã được cập nhật thành công!
+            </div>
+            
+            <button id="saveDistance" class="btn btn-primary mt-3">Lưu Khoảng Cách</button>
+          </div>
         </div>
       </div>
     </div>
@@ -145,6 +162,50 @@
         }
 
         distanceChart.update();
+      }
+    });
+
+    // Handle Save Distance Button Click
+    document.getElementById('saveDistance').addEventListener('click', () => {
+      const newDistance = document.getElementById('newDistance').value;
+      const errorMessage = document.getElementById('errorMessage');
+      
+      if (newDistance && !isNaN(newDistance) && newDistance > 0) {
+        // Hide error message if input is valid
+        errorMessage.style.display = 'none';
+
+        // Send POST request to change distance
+        fetch('/devices/intrusion/change_distance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            deviceId: '<%= device.uid %>',
+            newDistance: newDistance,
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // alert('Khoảng cách đã được cập nhật!');
+            // Optionally, you can update the chart or UI with the new distance here
+            successMessage.style.display = 'block';
+            alert('good')
+          } else {
+            errorMessage.style.display = 'block';
+            alert('not good')
+          }
+        })
+        .catch(error => {
+          console.error('Error updating distance:', error);
+          errorMessage.style.display = 'block';
+          alert('error')
+        });
+      } else {
+        // Display error message if input is invalid
+        errorMessage.style.display = 'block';
+        alert('what')
       }
     });
   });

@@ -1,4 +1,4 @@
-import Device from './device.model';
+import Device from '../models/device.model.js';
 
 class Lock extends Device {
   constructor(uid, userId, type, name, status = 'offline', data = {}) {

@@ -2,6 +2,8 @@
 
 import Device from '../models/device.model.js';
 import mqttClient from '../config/mqttConfig.js';
+import Lock from '../models/lock.model.js';
+import Intrusion from '../models/intrusion.model.js';
 
 class DeviceService {
   static async getDeviceByType(userId, deviceType) {
@@ -36,6 +38,10 @@ class DeviceService {
 
   static async updateDevicePassword(device, newPassword) {
     await device.updatePassword(newPassword);
+  }
+
+  static async updateDeviceDistance(device, distance) {
+    await device.updateDistance(distance);
   }
 
   static async publishToDevice(userId, device, action, parameters = {}) {
@@ -76,7 +82,6 @@ class DeviceService {
           type: device.type,
           temperature: historicalData[0]?.temperature || null,
           humidity: historicalData[0]?.humidity || null,
-          light: historicalData[0]?.light || null,
           timestamp: historicalData[0]?.timestamp || null,
         };
       })
