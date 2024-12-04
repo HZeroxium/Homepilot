@@ -275,18 +275,6 @@ class Device {
       throw error;
     }
   }
-
-  async updateDistance(distance) {
-    try {
-      this.data.distance = distance;
-      await devicesCollection
-        .doc(this.uid)
-        .update({ 'data.distance': distance });
-    } catch (error) {
-      console.error('Error updating device distance:', error);
-      throw error;
-    }
-  }
 }
 
 export default Device;

@@ -35,6 +35,17 @@ class MqttService {
       await this.handleIntrusionDevice(device, deviceData, userId);
     }
 
+    if (device.type === 'access_control') {
+      console.log('Access control device data:', deviceData);
+      // save historical data
+      const { method = '', status = '' } = deviceData;
+      const historicalData = {
+        method,
+        status,
+      };
+      await device.saveHistoricalData(historicalData);
+    }
+
     return { device, deviceType, deviceData, userId };
   }
 

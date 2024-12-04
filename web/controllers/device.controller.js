@@ -14,7 +14,13 @@ const deviceController = {
         return res.redirect('/dashboard');
       }
 
+      console.log('Device:', device);
+
       const historicalData = await DeviceService.getHistoricalData(device, 20);
+
+      // console.log('Historical Data: ', historicalData);
+
+      console.log('Device Type:', deviceType);
 
       res.render(`devices/${deviceType}`, {
         device,

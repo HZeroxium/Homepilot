@@ -92,6 +92,7 @@ class DeviceService {
 
     const temperatureDevices = devices.filter((d) => d.type === 'fire_smoke');
     const intrusionDevices = devices.filter((d) => d.type === 'intrusion');
+    const accessDevices = devices.filter((d) => d.type === 'access_control');
 
     const fireSmokeData = await Promise.all(
       temperatureDevices.map(async (device) => {
@@ -121,7 +122,20 @@ class DeviceService {
       })
     );
 
-    return [...fireSmokeData, ...intrusionData];
+    const accessData = await Promise.all(
+      accessDevices.map(async (device) => {
+        const historicalData = await device.getHistoricalData(1);
+        return {
+          device: device.uid,
+          name: device.name,
+          type: device.type,
+          status: historicalData[0]?.status || null,
+          timestamp: historicalData[0]?.timestamp || null,
+        };
+      })
+    );
+
+    return [...fireSmokeData, ...intrusionData, ...accessData];
   }
 }
 
