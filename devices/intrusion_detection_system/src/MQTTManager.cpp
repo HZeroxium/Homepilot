@@ -95,6 +95,10 @@ void MQTTManager::processCommand(const String &action, const String &params)
     system->deactivate();
     publishData("remote", "deactivated");
   }
+  else if (action == "update_distance")
+  {
+    system->updateDistance(params.toInt()); 
+  }
 }
 
 /**

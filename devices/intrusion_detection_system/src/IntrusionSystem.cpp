@@ -73,3 +73,8 @@ void IntrusionSystem::deactivate()
     isActivated = false;
     oled.showMessage("System Deactivated");
 }
+
+void IntrusionSystem::updateDistance(int distance)
+{
+    safeDistance = distance;
+}

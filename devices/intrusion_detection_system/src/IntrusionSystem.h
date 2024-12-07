@@ -21,6 +21,7 @@ public:
     void update();
     void activate();
     void deactivate();
+    void updateDistance(int distance);
 
 private:
     Motion &motion;
