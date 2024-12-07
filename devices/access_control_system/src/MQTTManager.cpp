@@ -115,6 +115,7 @@ void MQTTManager::publishData(const char *method, const char *status)
   doc["data"].to<JsonObject>()["method"] = method;
   doc["status"] = status;
 
+  Serial.println("Publishing data to " + String(data_topic));
   char jsonBuffer[256];
   serializeJson(doc, jsonBuffer);
 
