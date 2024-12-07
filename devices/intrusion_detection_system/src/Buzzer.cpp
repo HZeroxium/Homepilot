@@ -6,6 +6,8 @@ Buzzer::Buzzer(int pin, long interval)
 
 void Buzzer::setup() {
     pinMode(pin, OUTPUT);
+    ledcSetup(0, 1000, 8); // Channel 0, 1000 Hz frequency, 8-bit resolution (0-255)
+    ledcAttachPin(pin, 0); // Attach the buzzer pin to PWM channel 0
     off(); // Ensure the buzzer is off initially
 }
 
