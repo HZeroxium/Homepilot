@@ -1,3 +1,4 @@
+// NeoPixelManager.cpp
 #include "NeoPixelManager.h"
 
 /**

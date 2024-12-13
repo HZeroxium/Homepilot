@@ -1,3 +1,4 @@
+// MQTTManager.cpp
 #include "MQTTManager.h"
 
 MQTTManager *MQTTManager::instance = nullptr;
@@ -100,15 +101,7 @@ void MQTTManager::processCommand(const String &action, const String &params)
   }
 }
 
-/**
- * @brief Publishes a data message to the MQTT broker.
- *
- * This function serializes a JSON document containing the method and status
- * strings, and publishes it to the data topic.
- *
- * @param[in] method The method to unlock the door ("direct", "fingerprint", "remote").
- * @param[in] status The status to publish as a string. ("grant", "deny", "error").
- */
+
 void MQTTManager::publishData(const char *method, const char *status)
 {
   JsonDocument doc;

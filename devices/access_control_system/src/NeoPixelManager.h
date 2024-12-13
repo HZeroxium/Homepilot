@@ -1,3 +1,4 @@
+// NeoPixelManager.h
 #ifndef NEOPIXELMANAGER_H
 #define NEOPIXELMANAGER_H
 
