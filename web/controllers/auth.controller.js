@@ -3,25 +3,34 @@ import AuthService from '../services/auth.service.js';
 
 const authController = {
   getRegister: (req, res) => {
-    res.render('register', { error_msg: req.flash('error_msg') });
+    res.render('register', { title: 'Đăng ký' });
   },
 
   postRegister: async (req, res) => {
     const { displayName, email, password, confirmPassword } = req.body;
 
     try {
+      // Call your registration service
       await AuthService.registerUser(
         displayName,
         email,
         password,
         confirmPassword
       );
-      req.flash('success_msg', 'Registration successful! You can now log in.');
-      res.redirect('/login');
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: 'Registration successful! You can now log in. Redirecting in 3 seconds...',
+      });
     } catch (error) {
       console.error('Error during registration:', error);
-      req.flash('error_msg', error.message);
-      res.redirect('/register');
+
+      // Return error response
+      res.status(400).json({
+        success: false,
+        message: error.message || 'An error occurred during registration.',
+      });
     }
   },
 

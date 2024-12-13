@@ -1,13 +1,15 @@
 <!-- views/register.ejs -->
-<% title = 'Đăng Ký' %> <% title = 'Đăng Ký' %>
+<% title = 'Đăng Ký' %>
 
 <main class="container my-5">
   <h2 class="text-primary text-center mb-4">
     <i class="bi bi-person-plus-fill"></i> Đăng Ký
   </h2>
+  <!-- Alert Container -->
+  <div id="alert-container" class="mb-4"></div>
+
   <form
-    action="/register"
-    method="POST"
+    id="registerForm"
     class="mx-auto bg-light shadow p-4 rounded"
     style="max-width: 400px"
   >
@@ -71,8 +73,55 @@
       <i class="bi bi-person-plus"></i> Đăng Ký
     </button>
   </form>
+
   <p class="text-center mt-3">
     Bạn đã có tài khoản?
     <a href="/login" class="text-decoration-none text-primary">Đăng nhập</a>
   </p>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document
+    .getElementById('registerForm')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const alertContainer = document.getElementById('alert-container');
+      alertContainer.innerHTML = ''; // Clear previous alerts
+
+      // Get form data
+      const formData = {
+        displayName: document.getElementById('displayName').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        confirmPassword: document.getElementById('confirmPassword').value,
+      };
+
+      try {
+        // Submit form data via Axios
+        const response = await axios.post('/register', formData);
+
+        // Display success message
+        alertContainer.innerHTML = `
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle-fill"></i> ${response.data.message}
+        </div>
+      `;
+
+        // Redirect to login page after a delay
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 3000);
+      } catch (error) {
+        // Display error message
+        alertContainer.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle-fill"></i> ${
+            error.response?.data?.message || 'Đã xảy ra lỗi! Vui lòng thử lại.'
+          }
+        </div>
+      `;
+      }
+    });
+</script>
