@@ -127,7 +127,7 @@
     const tempHumidityChart = new Chart(ctx, config);
 
     // Populate chart with historical data
-    const historicalData = <%- JSON.stringify(historicalData || []) %>;
+    const historicalData = <%-JSON.stringify(historicalData || [])%>;
     historicalData.forEach(dataPoint => {
       const timestamp = new Date(dataPoint.timestamp._seconds * 1000).toLocaleTimeString();
       tempHumidityChart.data.labels.push(timestamp);

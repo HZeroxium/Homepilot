@@ -30,7 +30,65 @@ class MqttService {
       await this.handleFireSmokeDevice(device, deviceData, userId);
     }
 
+    // Handle intrusion devices
+    if (device.type === 'intrusion') {
+      await this.handleIntrusionDevice(device, deviceData, userId);
+    }
+
+    // Handle access_control devices
+    if (device.type === 'access_control') {
+      await this.handleAccessControlDevice(device, deviceData, userId);
+    }
+
     return { device, deviceType, deviceData, userId };
+  }
+
+  static async checkAnomaly(timestamp) {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/predict', {
+        timestamp: timestamp,
+      });
+
+      const { prediction } = response.data;
+
+      return prediction === 'anomaly';
+    } catch (error) {
+      console.error('Error checking anomaly:', error);
+      return false; // If the request fails, return false for anomaly status.
+    }
+  }
+
+  static async handleAccessControlDevice(device, deviceData, userId) {
+    console.log('Access control device data:', deviceData);
+    const { method = '', status = '' } = deviceData;
+
+    // check if status is granted, send notification
+
+    const isAnomaly = await this.checkAnomaly(deviceData.timestamp);
+
+    if (status === 'granted' && isAnomaly) {
+      await NotificationService.sendDevicesNotification({
+        message: 'Alert! Anomaly detected',
+        title: 'Notification',
+        deviceId: process.env.PUSHSAFER_DEVICE_ID,
+      });
+
+      await NotificationService.sendEmail({
+        to: process.env.EMAIL_RECEIVER,
+        from: process.env.EMAIL_SENDER,
+        subject: '[HOMEPILOT] NOTIFICATION',
+        text: 'Anomaly detected!',
+        device_name: device.name,
+      });
+      console.log('Alert! Anomaly detected');
+    }
+
+    // save historical data
+    const historicalData = {
+      method,
+      status,
+    };
+    await device.saveHistoricalData(historicalData);
   }
 
   static async handleFireSmokeDevice(device, deviceData, userId) {
@@ -66,6 +124,39 @@ class MqttService {
       temperature,
       humidity,
       light: deviceData.light || 0,
+      alertStatus: deviceData.alertStatus ? 'Danger' : 'Normal',
+    };
+    await device.saveHistoricalData(historicalData);
+  }
+
+  static async handleIntrusionDevice(device, deviceData, userId) {
+    const { distance = 0, motion = false } = deviceData;
+
+    const safeDistance = 20;
+
+    // Check for motion and send notifications
+    if (motion && distance <= safeDistance) {
+      await NotificationService.sendDevicesNotification({
+        message: 'Alert! Motion detected',
+        title: 'Notification',
+        deviceId: process.env.PUSHSAFER_DEVICE_ID,
+      });
+
+      await NotificationService.sendEmail({
+        to: process.env.EMAIL_RECEIVER,
+        from: process.env.EMAIL_SENDER,
+        subject: '[HOMEPILOT] NOTIFICATION',
+        text: 'Motion detected!',
+        device_name: device.name,
+      });
+      console.log('Alert! Motion detected');
+      deviceData.alertStatus = true;
+    }
+
+    // Save historical data
+    const historicalData = {
+      distance,
+      motion,
       alertStatus: deviceData.alertStatus ? 'Danger' : 'Normal',
     };
     await device.saveHistoricalData(historicalData);

@@ -1,5 +1,3 @@
-<!-- views/devices/access_control.ejs -->
-
 <% title = 'Hệ Thống Kiểm Soát Truy Cập' %>
 
 <main class="container mt-5">
@@ -25,4 +23,146 @@
   <a href="/devices/access_control/change_password" class="btn btn-warning">
     <i class="bi bi-key"></i> Thay Đổi Mật Khẩu
   </a>
+
+  <!-- Chart Section -->
+  <div class="mt-5">
+    <h5 class="text-primary mb-3">
+      <i class="bi bi-graph-up"></i> Biểu Đồ Trạng Thái Kiểm Soát Truy Cập
+    </h5>
+    <canvas
+      id="statusChart"
+      width="400"
+      height="200"
+      class="shadow-sm"
+    ></canvas>
+  </div>
 </main>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log("Device UID: <%= device.uid %>");
+
+    // Connect to Socket.io
+    const socket = io();
+
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io server.");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection Error:", err.message);
+    });
+
+    // Join room with userId
+    socket.emit("joinRoom", { userId: "<%= user.id %>" });
+
+    // Initialize chart data
+    const data = {
+      labels: [], // Time
+      datasets: [
+        {
+          label: 'Trạng Thái (Grant)',
+          data: [],
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+        },
+      ],
+    };
+
+    // Chart configuration
+    const config = {
+      type: 'bar',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+        },
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Thời gian',
+            },
+          },
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Grant Status',
+            },
+            min: 0,
+            max: 1,
+            ticks: {
+              stepSize: 1,
+              callback: function (value) {
+                return value === 1 ? 'Grant' : 'Deny';
+              },
+            },
+          },
+        },
+      },
+    };
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(ctx, config);
+
+    // Populate chart with historical data (status='grant')
+    const historicalData = <%- JSON.stringify(historicalData || []) %>;
+    historicalData.forEach((dataPoint) => {
+      const date = new Date(dataPoint.timestamp._seconds * 1000);
+      const dateLabel = date.toLocaleDateString(); // Date in 'MM/DD/YYYY' format
+      const timeLabel = date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }); // Time in 'HH:mm'
+
+      const timestamp = `${dateLabel}\n${timeLabel}`; // Two-line label
+      const status = dataPoint.status === 'grant' ? 1 : 0;
+
+      statusChart.data.labels.push(timestamp);
+      statusChart.data.datasets[0].data.push(status);
+    });
+
+    statusChart.update();
+
+    // Listen for real-time updates
+    socket.on('deviceDataUpdate', (data) => {
+      console.log("Received data from server:", data);
+      if (
+        data.deviceType === 'access_control' &&
+        data.deviceId === '<%= device.uid %>'
+      ) {
+        const now = new Date();
+        const dateLabel = now.toLocaleDateString(); // Date in 'MM/DD/YYYY' format
+        const timeLabel = now.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }); // Time in 'HH:mm'
+
+        const timestamp = `${dateLabel}\n${timeLabel}`; // Two-line label
+        const status = data.data.status === 'grant' ? 1 : 0;
+
+        statusChart.data.labels.push(timestamp);
+        statusChart.data.datasets[0].data.push(status);
+
+        // Limit data points
+        if (statusChart.data.labels.length > 20) {
+          statusChart.data.labels.shift();
+          statusChart.data.datasets[0].data.shift();
+        }
+
+        statusChart.update();
+      }
+    });
+  });
+</script>

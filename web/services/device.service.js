@@ -2,6 +2,8 @@
 
 import Device from '../models/device.model.js';
 import mqttClient from '../config/mqttConfig.js';
+import Lock from '../models/lock.model.js';
+import Intrusion from '../models/intrusion.model.js';
 
 class DeviceService {
   static async getDeviceByType(userId, deviceType) {
@@ -33,8 +35,32 @@ class DeviceService {
     await device.updateStatus(status);
   }
 
-  static async updateDevicePassword(device, newPassword) {
-    await device.updatePassword(newPassword);
+  static async updateDevicePassword(deviceData, newPassword) {
+    // Create a Lock instance using the device data
+    const lock = new Lock(
+      deviceData.uid,
+      deviceData.userId,
+      deviceData.type,
+      deviceData.name,
+      deviceData.status,
+      deviceData.data
+    );
+
+    // Call the updatePassword method
+    await lock.updatePassword(newPassword);
+  }
+
+  static async updateDeviceDistance(device, distance) {
+    const intrusion = new Intrusion(
+      device.uid,
+      device.userId,
+      device.type,
+      device.name,
+      device.status,
+      device.data
+    );
+
+    await intrusion.updateDistance(distance);
   }
 
   static async publishToDevice(userId, device, action, parameters = {}) {
@@ -64,7 +90,10 @@ class DeviceService {
     }
 
     const temperatureDevices = devices.filter((d) => d.type === 'fire_smoke');
-    const data = await Promise.all(
+    const intrusionDevices = devices.filter((d) => d.type === 'intrusion');
+    const accessDevices = devices.filter((d) => d.type === 'access_control');
+
+    const fireSmokeData = await Promise.all(
       temperatureDevices.map(async (device) => {
         const historicalData = await device.getHistoricalData(1);
         return {
@@ -73,13 +102,39 @@ class DeviceService {
           type: device.type,
           temperature: historicalData[0]?.temperature || null,
           humidity: historicalData[0]?.humidity || null,
-          light: historicalData[0]?.light || null,
           timestamp: historicalData[0]?.timestamp || null,
         };
       })
     );
 
-    return data;
+    const intrusionData = await Promise.all(
+      intrusionDevices.map(async (device) => {
+        const historicalData = await device.getHistoricalData(1);
+        return {
+          device: device.uid,
+          name: device.name,
+          type: device.type,
+          distance: historicalData[0]?.distance || null,
+          motion: historicalData[0]?.motion || null,
+          timestamp: historicalData[0]?.timestamp || null,
+        };
+      })
+    );
+
+    const accessData = await Promise.all(
+      accessDevices.map(async (device) => {
+        const historicalData = await device.getHistoricalData(1);
+        return {
+          device: device.uid,
+          name: device.name,
+          type: device.type,
+          status: historicalData[0]?.status || null,
+          timestamp: historicalData[0]?.timestamp || null,
+        };
+      })
+    );
+
+    return [...fireSmokeData, ...intrusionData, ...accessData];
   }
 }
 

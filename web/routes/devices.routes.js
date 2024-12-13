@@ -47,4 +47,7 @@ router.post(
   deviceController.postChangePassword
 );
 
+// Handle change distance
+router.post('/intrusion/change_distance', deviceController.postChangeDistance);
+
 export default router;

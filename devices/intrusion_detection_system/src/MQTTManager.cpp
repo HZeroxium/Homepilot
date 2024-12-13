@@ -5,11 +5,9 @@ MQTTManager *MQTTManager::instance = nullptr;
 /**
  * @brief Initializes the MQTT client and connects to the MQTT broker.
  */
-void MQTTManager::init(WiFiClient &client, ServoManager *servo, DisplayManager *display, NeoPixelManager *neoPixel)
+void MQTTManager::init(WiFiClient &client, IntrusionSystem *system)
 {
-  this->servoManager = servo;
-  this->displayManager = display;
-  this->neoPixelManager = neoPixel;
+  this->system = system;
 
   mqttClient.setClient(client);
   mqttClient.setServer(mqtt_server, 1883);
@@ -36,6 +34,13 @@ void MQTTManager::init(WiFiClient &client, ServoManager *servo, DisplayManager *
 void MQTTManager::loop()
 {
   mqttClient.loop();
+  // send every 10 seconds
+  static unsigned long lastSend = 0;
+  if (millis() - lastSend > 5000)
+  {
+    lastSend = millis();
+    publishData("direct", "hello");
+  }
 }
 
 /**
@@ -80,23 +85,19 @@ void MQTTManager::handleCallback(char *topic, byte *payload, unsigned int length
  */
 void MQTTManager::processCommand(const String &action, const String &params)
 {
-  if (action == "unlock")
+  if (action == "activate_Intrusion")
   {
-    servoManager->grantAccess(neoPixelManager, displayManager);
-    publishData("remote", "grant");
+    system->activate();
+    publishData("remote", "activated");
   }
-  else if (action == "lock")
+  else if (action == "deactivate_Intrusion")
   {
-    displayManager->showMessage("Locking...");
-    servoManager->init();
-    neoPixelManager->setReady();
-    // publishData("Door Locked");
+    system->deactivate();
+    publishData("remote", "deactivated");
   }
-  else if (action == "update_pin")
+  else if (action == "update_distance")
   {
-    displayManager->showMessage("PIN Updated");
-    servoManager->setValidPIN(params);
-    // publishData("PIN Updated");
+    system->updateDistance(params.toInt()); 
   }
 }
 
@@ -111,11 +112,16 @@ void MQTTManager::processCommand(const String &action, const String &params)
  */
 void MQTTManager::publishData(const char *method, const char *status)
 {
+  Serial.println("Publishing data to MQTT");
   JsonDocument doc;
-  doc["data"].to<JsonObject>()["method"] = method;
-  doc["status"] = status;
+  JsonObject data = doc["data"].to<JsonObject>();
+  data["method"] = method;
+  data["status"] = status;
+  data["alertStatus"] = system->isAlarm();
+  data["motion"] = system->readMotion();
+  data["distance"] = system->readDistance();
 
-  Serial.println("Publishing data to " + String(data_topic));
+
   char jsonBuffer[256];
   serializeJson(doc, jsonBuffer);
 

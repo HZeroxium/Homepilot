@@ -14,10 +14,13 @@ const deviceController = {
         return res.redirect('/dashboard');
       }
 
-      const historicalData =
-        device.type === 'fire_smoke'
-          ? await DeviceService.getHistoricalData(device, 20)
-          : [];
+      console.log('Device:', device);
+
+      const historicalData = await DeviceService.getHistoricalData(device, 20);
+
+      // console.log('Historical Data: ', historicalData);
+
+      console.log('Device Type:', deviceType);
 
       res.render(`devices/${deviceType}`, {
         device,
@@ -219,6 +222,36 @@ const deviceController = {
       res.redirect('/devices/access_control');
     } catch (error) {
       console.error('Error in postChangePassword:', error);
+      next(error);
+    }
+  },
+
+  async postChangeDistance(req, res, next) {
+    const userId = req.session.user.uid;
+    const deviceType = 'intrusion';
+    const { newDistance } = req.body;
+
+    try {
+      const device = await DeviceService.getDeviceByType(userId, deviceType);
+      if (!device) {
+        req.flash('error_msg', 'Device does not exist.');
+        return res.redirect('/dashboard');
+      }
+
+      if (!newDistance || newDistance < 0 || newDistance > 200) {
+        req.flash('error_msg', 'Please provide a valid distance.');
+        return res.redirect('/devices/intrusion');
+      }
+
+      await DeviceService.updateDeviceDistance(device, newDistance);
+      await DeviceService.publishToDevice(userId, device, 'update_distance', {
+        newDistance,
+      });
+
+      req.flash('success_msg', 'Distance updated successfully.');
+      res.redirect('/devices/intrusion');
+    } catch (error) {
+      console.error('Error in postChangeDistance:', error);
       next(error);
     }
   },

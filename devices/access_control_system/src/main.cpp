@@ -60,6 +60,7 @@ void setup()
  * 3. Checks the potentiometer for a high value, which simulates a fingerprint
  *    scan, and grants access to the door if it is high.
  */
+
 void loop()
 {
   keypadManager.handleKeypadInput(&servoManager, &neoPixelManager, &mqttManager);
