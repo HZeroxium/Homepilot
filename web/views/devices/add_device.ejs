@@ -2,14 +2,33 @@
 <% title = 'Thêm Thiết Bị Mới' %>
 
 <main class="container mt-5">
+  <!-- Back to Dashboard Button -->
+  <div class="mb-4">
+    <a href="/dashboard" class="btn btn-secondary">
+      <i class="bi bi-arrow-left-circle"></i> Quay về Dashboard
+    </a>
+  </div>
+
+  <!-- Page Header -->
   <h2 class="text-primary mb-4">
     <i class="bi bi-plus-square"></i> Thêm Thiết Bị Mới
   </h2>
 
-  <form action="/devices/add" method="POST">
+  <!-- Alert Container -->
+  <div id="alert-container" class="mb-4"></div>
+
+  <!-- Add Device Form -->
+  <form id="addDeviceForm" class="bg-light shadow p-4 rounded">
     <div class="mb-3">
       <label for="name" class="form-label">Tên thiết bị:</label>
-      <input type="text" class="form-control" name="name" id="name" required />
+      <input
+        type="text"
+        class="form-control"
+        name="name"
+        id="name"
+        required
+        placeholder="Nhập tên thiết bị"
+      />
     </div>
     <div class="mb-3">
       <label for="type" class="form-label">Loại thiết bị:</label>
@@ -24,3 +43,47 @@
     </button>
   </form>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document
+    .getElementById('addDeviceForm')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const alertContainer = document.getElementById('alert-container');
+      alertContainer.innerHTML = ''; // Clear previous alerts
+
+      // Get form data
+      const formData = {
+        name: document.getElementById('name').value,
+        type: document.getElementById('type').value,
+      };
+
+      try {
+        // Send POST request to add the device
+        const response = await axios.post('/devices/add', formData);
+
+        // Display success message
+        alertContainer.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="bi bi-check-circle-fill"></i> ${response.data.message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+
+        // Clear the form
+        document.getElementById('addDeviceForm').reset();
+      } catch (error) {
+        // Display error message
+        alertContainer.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i> ${
+            error.response?.data?.message || 'Đã xảy ra lỗi! Vui lòng thử lại.'
+          }
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+      }
+    });
+</script>

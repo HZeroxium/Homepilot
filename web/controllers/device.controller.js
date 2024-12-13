@@ -54,11 +54,7 @@ const deviceController = {
   },
 
   getAddDevicePage(req, res) {
-    res.render('devices/add_device', {
-      title: 'Add Device',
-      success_msg: req.flash('success_msg'),
-      error_msg: req.flash('error_msg'),
-    });
+    res.render('devices/add_device');
   },
 
   async postAddDevice(req, res) {
@@ -66,18 +62,29 @@ const deviceController = {
     const { type, name } = req.body;
 
     try {
+      // Validate required fields
       if (!type || !name) {
-        req.flash('error_msg', 'Please provide all required fields.');
-        return res.redirect('/devices/add');
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide all required fields.',
+        });
       }
 
+      // Add the device using the service
       await DeviceService.createDevice(userId, type, name);
-      req.flash('success_msg', 'Device added successfully.');
-      res.redirect('/dashboard');
+
+      // Send success response
+      res
+        .status(200)
+        .json({ success: true, message: 'Devices added successfully.' });
     } catch (error) {
       console.error('Error adding device:', error);
-      req.flash('error_msg', 'An error occurred while adding the device.');
-      res.redirect('/devices/add');
+
+      // Send error response
+      res.status(500).json({
+        success: false,
+        message: `Failed to add device: ${error.message}`,
+      });
     }
   },
 
@@ -138,23 +145,22 @@ const deviceController = {
 
   async deleteDevice(req, res, next) {
     const { deviceId } = req.params;
+    console.log('deviceId:', deviceId);
     const userId = req.session.user.uid;
 
     try {
       const device = await DeviceService.getDeviceById(deviceId);
       if (!device || device.userId !== userId) {
-        req.flash(
-          'error_msg',
-          'Device does not exist or you do not have access.'
-        );
-        return res.redirect('/dashboard');
+        res
+          .status(403)
+          .json({ error: 'You do not have permission to delete this device.' });
       }
 
       await DeviceService.deleteDevice(device);
-      req.flash('success_msg', 'Device deleted successfully.');
-      res.redirect('/dashboard');
+      res.status(200).json({ message: 'Device deleted successfully.' });
     } catch (error) {
       console.error('Error in deleteDevice:', error);
+      res.status(500).json({ message: error.message });
       next(error);
     }
   },

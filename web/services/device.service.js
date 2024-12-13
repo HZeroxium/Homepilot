@@ -13,8 +13,7 @@ class DeviceService {
   }
 
   static async createDevice(userId, type, name) {
-    const device = await Device.createDevice(userId, type, name);
-    await device.logActivity('added', userId);
+    const device = await Device.create(userId, type, name);
     return device;
   }
 

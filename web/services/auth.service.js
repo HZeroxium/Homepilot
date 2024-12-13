@@ -33,8 +33,12 @@ class AuthService {
     }
 
     const user = await User.findByEmail(email);
-    if (!user || !(await user.comparePassword(password))) {
-      throw new Error('Incorrect email or password.');
+
+    if (!user)
+      throw new Error('Incorrect email. Please try again or register.');
+
+    if (!(await user.comparePassword(password))) {
+      throw new Error('Incorrect password. Please try again.');
     }
 
     return user;

@@ -22,7 +22,7 @@ router.get('/:deviceId/edit', deviceController.getEditDevicePage);
 router.post('/:deviceId/edit', deviceController.postEditDevice);
 
 // Handle Delete Device
-router.post('/:deviceId/delete', deviceController.deleteDevice);
+router.delete('/:deviceId/delete', deviceController.deleteDevice);
 
 // Display Device Management Page
 router.get('/:deviceType', deviceController.getDevicePage);

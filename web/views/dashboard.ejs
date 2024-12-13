@@ -1,27 +1,21 @@
 <!-- views/dashboard.ejs -->
 <% title = 'Dashboard' %>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
 
-<% title = 'Dashboard' %>
-
 <main class="container my-4">
+  <a href="/" class="btn btn-secondary my-4">
+    <i class="bi bi-house-door-fill"></i> Quay về Trang Chủ
+  </a>
   <h2 class="text-primary mb-4">
     <i class="bi bi-speedometer2"></i> Dashboard
   </h2>
   <p>Xin chào, <strong><%= user.displayName %></strong>!</p>
 
-  <% if (error_msg) { %>
-    <div class="alert alert-danger">
-      <i class="bi bi-exclamation-circle-fill"></i> <%= error_msg %>
-    </div>
-  <% } %>
-  <% if (success_msg) { %>
-    <div class="alert alert-success">
-      <i class="bi bi-check-circle-fill"></i> <%= success_msg %>
-    </div>
-  <% } %>
+  <!-- Alert Section -->
+  <div id="alert-container" class="mb-4"></div>
 
   <h3 class="my-4">
     <i class="bi bi-grid"></i> Thiết bị của bạn
@@ -48,16 +42,12 @@
               <a href="/devices/<%= device.uid %>/edit" class="btn btn-outline-secondary">
                 <i class="bi bi-pencil-square"></i> Chỉnh Sửa
               </a>
-              <form
-                action="/devices/<%= device.uid %>/delete"
-                method="POST"
-                onsubmit="return confirm('Bạn có chắc chắn muốn xóa thiết bị này?');"
-                class="d-inline"
+              <button
+                class="btn btn-danger delete-device-btn"
+                data-uid="<%= device.uid %>"
               >
-                <button type="submit" class="btn btn-danger">
-                  <i class="bi bi-trash-fill"></i> Xóa
-                </button>
-              </form>
+                <i class="bi bi-trash-fill"></i> Xóa
+              </button>
             </div>
           </div>
         </div>
@@ -68,9 +58,46 @@
   <a href="/devices/add" class="btn btn-success mt-4">
     <i class="bi bi-plus-circle-fill"></i> Thêm Thiết Bị Mới
   </a>
+  
 </main>
 
+<script>
+  // Select alert container
+  const alertContainer = document.getElementById('alert-container');
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/main.js"></script>
+  // Function to show alerts
+  const showAlert = (message, type = 'success') => {
+    alertContainer.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+  };
 
+  // Handle delete device with Axios
+  document.querySelectorAll('.delete-device-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const uid = btn.getAttribute('data-uid');
+
+      if (confirm('Bạn có chắc chắn muốn xóa thiết bị này?')) {
+        try {
+          // Send DELETE request
+          const response = await axios.delete(`/devices/${uid}/delete`);
+
+          // Show success alert
+          showAlert(response.data.message, 'success');
+
+          // Remove the device card from the DOM
+          btn.closest('.col-md-4').remove();
+        } catch (error) {
+          // Show error alert
+          showAlert(
+            error.response?.data?.message || 'Đã xảy ra lỗi! Vui lòng thử lại.',
+            'danger'
+          );
+        }
+      }
+    });
+  });
+</script>

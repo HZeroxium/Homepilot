@@ -21,7 +21,8 @@ const authController = {
       // Return success response
       res.status(200).json({
         success: true,
-        message: 'Registration successful! You can now log in. Redirecting in 3 seconds...',
+        message:
+          'Registration successful! You can now log in. Redirecting in 3 seconds...',
       });
     } catch (error) {
       console.error('Error during registration:', error);
@@ -35,25 +36,37 @@ const authController = {
   },
 
   getLogin: (req, res) => {
-    res.render('login', { title: 'Login', error_msg: req.flash('error_msg') });
+    res.render('login');
   },
 
   postLogin: async (req, res) => {
     const { email, password } = req.body;
 
     try {
+      // Authenticate the user
       const user = await AuthService.loginUser(email, password);
+
+      // Set session data
       req.session.user = {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
       };
-      req.flash('success_msg', 'Login successful!');
-      res.redirect('/dashboard');
+
+      // Send success response
+      res.status(200).json({
+        success: true,
+        message: 'Login successful! Redirecting in 3 seconds...',
+        redirectUrl: '/dashboard',
+      });
     } catch (error) {
       console.error('Error during login:', error);
-      req.flash('error_msg', error.message);
-      res.redirect('/login');
+
+      // Send error response
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Incorrect email or password.',
+      });
     }
   },
 
