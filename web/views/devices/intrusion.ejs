@@ -1,3 +1,5 @@
+<!-- views/devices/intrusion.ejs -->
+
 <% title = 'Hệ Thống Cảnh Báo Xâm Nhập' %>
 
 <main class="container mt-5">
@@ -10,6 +12,7 @@
   <h2 class="text-primary mb-4">
     <i class="bi bi-shield-lock"></i> Quản Lý Hệ Thống Cảnh Báo Xâm Nhập
   </h2>
+  <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
 
   <div class="row g-4">
     <!-- Distance and Motion -->
@@ -18,11 +21,19 @@
         <div class="card-body">
           <h5 class="card-title"><i class="bi bi-rulers"></i> Khoảng cách</h5>
           <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].distance %> cm</span>
+            <span class="fw-bold">
+              <%= historicalData?.length > 0 && historicalData[historicalData.length - 1]?.distance 
+                ? historicalData[historicalData.length - 1].distance 
+                : 'None' %> cm
+            </span>
           </p>
           <h5 class="card-title"><i class="bi bi-activity"></i> Chuyển động</h5>
           <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].motion ? 'Có' : 'Không' %></span>
+            <span class="fw-bold">
+              <%= historicalData?.length > 0 && historicalData[historicalData.length - 1]?.motion 
+                ? 'Có' 
+                : 'Không' %>
+            </span>
           </p>
 
           <!-- Input Field and Save Button -->
@@ -51,9 +62,13 @@
         <div class="card-body">
           <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Trạng Thái Cảnh Báo</h5>
           <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].alertStatus %></span>
+            <span class="fw-bold">
+              <%= historicalData?.length > 0 && historicalData[historicalData.length - 1]?.alertStatus 
+                ? historicalData[historicalData.length - 1].alertStatus 
+                : 'Không có dữ liệu' %>
+            </span>
           </p>
-          <% if (historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
+          <% if (historicalData?.length > 0 && historicalData[historicalData.length - 1]?.alertStatus === 'Danger') { %>
             <div class="alert alert-danger mt-3">
               <i class="bi bi-exclamation-circle"></i> Cảnh báo! Phát hiện chuyển động bất thường.
             </div>
@@ -69,6 +84,7 @@
     <canvas id="distanceChart" width="400" height="200" class="shadow-sm"></canvas>
   </div>
 </main>
+
 
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -14,7 +14,7 @@
   <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
   <p>
     Trạng thái cửa:
-    <span class="fw-bold"><%= device.data.doorStatus || 'Unknown' %></span>
+    <span class="fw-bold"><%= device.data.status || 'Unknown' %></span>
   </p>
   <form
     action="/devices/access_control/action"
