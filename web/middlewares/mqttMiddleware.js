@@ -1,8 +1,8 @@
 // middlewares/mqttMiddleware.js
 
-const mqttClient = require("../controllers/mqttController");
+import mqttClient from '../controllers/mqttController.js';
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   req.mqttClient = mqttClient;
   next();
 };

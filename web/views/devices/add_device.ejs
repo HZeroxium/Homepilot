@@ -1,23 +1,26 @@
 <!-- views/devices/add_device.ejs -->
 <% title = 'Thêm Thiết Bị Mới' %>
 
-<main class="container mx-auto px-4">
-  <h2 class="text-2xl font-bold text-primary mb-4">Thêm Thiết Bị Mới</h2>
+<main class="container mt-5">
+  <h2 class="text-primary mb-4">
+    <i class="bi bi-plus-square"></i> Thêm Thiết Bị Mới
+  </h2>
 
   <form action="/devices/add" method="POST">
-    <div>
-      <label for="name">Tên thiết bị:</label>
-      <input type="text" name="name" id="name" required />
+    <div class="mb-3">
+      <label for="name" class="form-label">Tên thiết bị:</label>
+      <input type="text" class="form-control" name="name" id="name" required />
     </div>
-    <div>
-      <label for="type">Loại thiết bị:</label>
-      <select name="type" id="type" required>
+    <div class="mb-3">
+      <label for="type" class="form-label">Loại thiết bị:</label>
+      <select class="form-select" name="type" id="type" required>
         <option value="intrusion">Phát Hiện Xâm Nhập</option>
         <option value="fire_smoke">Cảnh Báo Cháy Và Khói</option>
         <option value="access_control">Kiểm Soát Truy Cập</option>
-        <!-- Thêm các loại thiết bị khác nếu cần -->
       </select>
     </div>
-    <button type="submit" class="btn btn-primary mt-4">Thêm Thiết Bị</button>
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Thêm Thiết Bị
+    </button>
   </form>
 </main>

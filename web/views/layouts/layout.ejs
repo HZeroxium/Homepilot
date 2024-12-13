@@ -4,30 +4,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= typeof title !== 'undefined' ? title : 'My App' %></title>
-    <link rel="stylesheet" href="/css/styles.css" />
+    <title><%= typeof title !== "undefined" ? title : "IoT Dashboard" %></title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- <link rel="stylesheet" href="/css/styles.css" /> -->
   </head>
-  <body class="flex flex-col min-h-screen">
-    <!-- Header -->
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
     <header>
       <%- include('../partials/navbar') %>
     </header>
 
-    <!-- Main Content: Add flex-grow to take available space -->
-    <main class="flex-grow container mx-auto py-8">
+    <!-- Main Content -->
+    <main class="flex-grow-1 container py-4">
       <% if (success_msg) { %>
         <div class="alert alert-success"><%= success_msg %></div>
       <% } %>
       <% if (error_msg) { %>
         <div class="alert alert-danger"><%= error_msg %></div>
       <% } %>
-      <!-- Main Content -->
       <%- body %>
     </main>
 
-    <!-- Footer: Sticks to the bottom -->
-    <footer class="bg-dark text-white py-4">
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3">
       <%- include('../partials/footer') %>
     </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
+

@@ -1,30 +1,45 @@
 <!-- views/devices/edit_device.ejs -->
 <% title = 'Chỉnh Sửa Thiết Bị' %>
 
-<main class="container mx-auto px-4">
-  <h2 class="text-2xl font-bold text-primary mb-4">Chỉnh Sửa Thiết Bị</h2>
+<main class="container mt-5">
+  <h2 class="text-primary mb-4"><i class="bi bi-pencil-square"></i> Chỉnh Sửa Thiết Bị</h2>
 
   <% if (error_msg) { %>
-    <div class="alert alert-error"><%= error_msg %></div>
+    <div class="alert alert-danger"><%= error_msg %></div>
   <% } %>
   <% if (success_msg) { %>
     <div class="alert alert-success"><%= success_msg %></div>
   <% } %>
 
   <form action="/devices/<%= device.uid %>/edit" method="POST">
-    <div>
-      <label for="name">Tên thiết bị:</label>
-      <input type="text" name="name" id="name" value="<%= device.name %>" required />
+    <div class="mb-3">
+      <label for="name" class="form-label">Tên thiết bị:</label>
+      <input
+        type="text"
+        class="form-control"
+        name="name"
+        id="name"
+        value="<%= device.name %>"
+        required
+      />
     </div>
-    <div>
-      <label for="type">Loại thiết bị:</label>
-      <select name="type" id="type" required>
-        <option value="intrusion" <%= device.type === 'intrusion' ? 'selected' : '' %>>Phát Hiện Xâm Nhập</option>
-        <option value="fire_smoke" <%= device.type === 'fire_smoke' ? 'selected' : '' %>>Cảnh Báo Cháy Và Khói</option>
-        <option value="access_control" <%= device.type === 'access_control' ? 'selected' : '' %>>Kiểm Soát Truy Cập</option>
-        <!-- Add more device types if needed -->
+    <div class="mb-3">
+      <label for="type" class="form-label">Loại thiết bị:</label>
+      <select class="form-select" name="type" id="type" required>
+        <option value="intrusion" <%= device.type === 'intrusion' ? 'selected' : '' %>>
+          Phát Hiện Xâm Nhập
+        </option>
+        <option value="fire_smoke" <%= device.type === 'fire_smoke' ? 'selected' : '' %>>
+          Cảnh Báo Cháy Và Khói
+        </option>
+        <option value="access_control" <%= device.type === 'access_control' ? 'selected' : '' %>>
+          Kiểm Soát Truy Cập
+        </option>
       </select>
     </div>
-    <button type="submit" class="btn btn-primary mt-4">Lưu Thay Đổi</button>
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-save"></i> Lưu Thay Đổi
+    </button>
   </form>
 </main>
+
