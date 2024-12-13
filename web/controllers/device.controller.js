@@ -98,18 +98,15 @@ const deviceController = {
     try {
       const device = await DeviceService.getDeviceById(deviceId);
       if (!device || device.userId !== userId) {
-        req.flash(
-          'error_msg',
-          'Device does not exist or you do not have access.'
-        );
-        return res.redirect('/dashboard');
+        return res.status(404).json({
+          success: false,
+          message: 'Device does not exist or you do not have access.',
+        });
       }
 
       res.render('devices/edit_device', {
-        title: 'Edit Device',
+        title: 'Chỉnh Sửa Thiết Bị',
         device,
-        success_msg: req.flash('success_msg'),
-        error_msg: req.flash('error_msg'),
       });
     } catch (error) {
       console.error('Error in getEditDevicePage:', error);
@@ -125,21 +122,25 @@ const deviceController = {
     try {
       const device = await DeviceService.getDeviceById(deviceId);
       if (!device || device.userId !== userId) {
-        req.flash(
-          'error_msg',
-          'Device does not exist or you do not have access.'
-        );
-        return res.redirect('/dashboard');
+        return res.status(404).json({
+          success: false,
+          message: 'Device does not exist or you do not have access.',
+        });
       }
 
       if (!name || !type) {
-        req.flash('error_msg', 'Please provide all required fields.');
-        return res.redirect(`/devices/${deviceId}/edit`);
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide all required fields.',
+        });
       }
 
       await DeviceService.updateDeviceInfo(device, { name, type });
-      req.flash('success_msg', 'Device updated successfully.');
-      res.redirect('/dashboard');
+
+      res.status(200).json({
+        success: true,
+        message: 'Device updated successfully.',
+      });
     } catch (error) {
       console.error('Error in postEditDevice:', error);
       next(error);
@@ -173,44 +174,42 @@ const deviceController = {
     const deviceType = 'access_control';
 
     try {
-      // Retrieve the access control device by its type
       const device = await DeviceService.getDeviceByType(userId, deviceType);
 
-      // Check if the device exists
       if (!device) {
-        // Flash an error message if the device does not exist
-        req.flash('error_msg', 'Device does not exist.');
-        return res.redirect('/dashboard');
+        return res.status(404).json({
+          success: false,
+          message: 'Device does not exist.',
+        });
       }
 
-      // Render the change password page with the device details
-      res.render('devices/change_password', {
-        device,
-        success_msg: req.flash('success_msg'),
-        error_msg: req.flash('error_msg'),
-      });
+      res.render('devices/change_password', { device });
     } catch (error) {
-      console.error('Error in getChangePasswordPage:', error);
-      // Pass the error to the next middleware function
+      console.error('Error in getChangePassword:', error);
       next(error);
     }
   },
 
-  async postChangePassword(req, res, next) {
+  postChangePassword: async (req, res, next) => {
     const userId = req.session.user.uid;
     const deviceType = 'access_control';
     const { newPassword, confirmPassword } = req.body;
 
     try {
       const device = await DeviceService.getDeviceByType(userId, deviceType);
+
       if (!device) {
-        req.flash('error_msg', 'Device does not exist.');
-        return res.redirect('/dashboard');
+        return res.status(404).json({
+          success: false,
+          message: 'Device does not exist.',
+        });
       }
 
       if (!newPassword || newPassword !== confirmPassword) {
-        req.flash('error_msg', 'Passwords do not match.');
-        return res.redirect('/devices/access_control/change_password');
+        return res.status(400).json({
+          success: false,
+          message: 'Passwords do not match.',
+        });
       }
 
       await DeviceService.updateDevicePassword(device, newPassword);
@@ -218,8 +217,10 @@ const deviceController = {
         newPassword,
       });
 
-      req.flash('success_msg', 'Password updated successfully.');
-      res.redirect('/devices/access_control');
+      res.status(200).json({
+        success: true,
+        message: 'Password updated successfully.',
+      });
     } catch (error) {
       console.error('Error in postChangePassword:', error);
       next(error);
