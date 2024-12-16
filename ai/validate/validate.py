@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import confusion_matrix, classification_report
-import joblib
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -17,34 +17,44 @@ def preprocess_data(df):
     df["time_diff"] = df["timestamp"].diff().dt.total_seconds().fillna(0)
     
     X = df[["hour", "day_of_week", "month", "year", "day_of_year", "time_diff"]]
-    return X
+    y = df["label"]  # Assuming 'label' is the target column
+    return X, y
 
-def train_model(df):
-    X = preprocess_data(df)
-    
+def train_model(X_train, y_train):
     # Train the Isolation Forest model
-    model = IsolationForest(n_estimators=100, contamination=0.1, random_state=42) 
+    model = IsolationForest(n_estimators=100, contamination=0.1, random_state=42)
+    model.fit(X_train) 
     
     # Predict anomalies
-    df["predicted_anomaly"] = model.predict(X)
+    y_pred_train = model.predict(X_train)
     
-    # Convert predictions to 1 (normal) and -1 (anomaly)
-    df["predicted_anomaly"] = df["predicted_anomaly"].map({1: 1, -1: -1})
+    # Map predictions to 1 (normal) and -1 (anomaly)
+    y_pred_train = pd.Series(y_pred_train).map({1: 1, -1: -1})
     
-    return model, df
+    return model, y_pred_train
 
+# Load and preprocess data
 df = pd.read_csv('validate_dataset.csv')
-model, test_results = train_model(df)
+X, y = preprocess_data(df)
 
-accuracy = (test_results["predicted_anomaly"] == test_results["label"]).mean()
-print(f"Accuracy: {accuracy * 100:.2f}%")
+# Split into training and testing sets (70% train, 30% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
+# Train model
+model, y_pred_train = train_model(X_train, y_train)
+
+# Test the model
+y_pred_test = model.predict(X_test)
+y_pred_test = pd.Series(y_pred_test).map({1: 1, -1: -1})
+y_test = y_test.reset_index(drop=True)  # Align indices of y_test
+
+
+# Evaluate model
+accuracy = (y_pred_test == y_test).mean()
+print(f"Accuracy on Test Data: {accuracy * 100:.2f}%")
+ 
 # Confusion matrix
-y_true = test_results["label"]
-y_pred = test_results["predicted_anomaly"]
-
-# Generate confusion matrix
-cm = confusion_matrix(y_true, y_pred, labels=[1, -1])
+cm = confusion_matrix(y_test, y_pred_test, labels=[1, -1])
 
 plt.figure(figsize=(8, 6))
 sns.heatmap(cm, annot=True, fmt='d', cmap="Blues", xticklabels=["Normal", "Anomaly"], yticklabels=["Normal", "Anomaly"])
@@ -53,8 +63,7 @@ plt.ylabel("True")
 plt.title("Confusion Matrix")
 plt.show()
 
-labels = [1, -1] 
-report = classification_report(y_true, y_pred, labels=labels, target_names=["Normal", "Anomaly"])
-
+# Classification report
+labels = [1, -1]
+report = classification_report(y_test, y_pred_test, labels=labels, target_names=["Normal", "Anomaly"])
 print(report)
-

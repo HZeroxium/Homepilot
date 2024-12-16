@@ -43,13 +43,38 @@ class MqttService {
     return { device, deviceType, deviceData, userId };
   }
 
-  static async checkAnomaly(timestamp) {
+  static async checkAnomaly() {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/predict', {
-        timestamp: timestamp,
+      // Create a timestamp in the format: "December 7, 2024 at 7:45:12 AM UTC+7"
+      const timestamp = new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short',
+        timeZone: 'Asia/Bangkok', // Set timezone to UTC+7
+      }).format(new Date());
+
+      const formattedTimestamp = timestamp.replace('GMT', 'UTC');
+
+      console.log('Checking anomaly for timestamp:', timestamp);
+
+      const response = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ timestamp: formattedTimestamp }),
       });
 
-      const { prediction } = response.data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const { prediction } = data;
 
       return prediction === 'anomaly';
     } catch (error) {
@@ -64,7 +89,7 @@ class MqttService {
 
     // check if status is granted, send notification
 
-    const isAnomaly = await this.checkAnomaly(deviceData.timestamp);
+    const isAnomaly = await this.checkAnomaly();
 
     if (status === 'granted' && isAnomaly) {
       await NotificationService.sendDevicesNotification({
