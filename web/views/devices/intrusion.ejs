@@ -12,11 +12,11 @@
         <div class="card-body">
           <h5 class="card-title"><i class="bi bi-rulers"></i> Khoảng cách</h5>
           <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].distance %> cm</span>
-          </p>
-          <h5 class="card-title"><i class="bi bi-activity"></i> Chuyển động</h5>
-          <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].motion ? 'Có' : 'Không' %></span>
+            <% if (historicalData && historicalData.length > 0) { %>
+              <span class="fw-bold"><%= historicalData[historicalData.length - 1].distance %> cm</span>
+            <% } else { %>
+              <span class="fw-bold">Chưa có dữ liệu</span>
+            <% } %>
           </p>
 
           <!-- Input Field and Save Button -->
@@ -45,9 +45,13 @@
         <div class="card-body">
           <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Trạng Thái Cảnh Báo</h5>
           <p class="card-text">
-            <span class="fw-bold"><%= historicalData[historicalData.length - 1].alertStatus %></span>
+            <% if (historicalData && historicalData.length > 0) { %>
+              <span class="fw-bold"><%= historicalData[historicalData.length - 1].alertStatus %></span>
+            <% } else { %>
+              <span class="fw-bold">Chưa có dữ liệu</span>
+            <% } %>
           </p>
-          <% if (historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
+          <% if (historicalData && historicalData.length > 0 && historicalData[historicalData.length - 1].alertStatus === 'Danger') { %>
             <div class="alert alert-danger mt-3">
               <i class="bi bi-exclamation-circle"></i> Cảnh báo! Phát hiện chuyển động bất thường.
             </div>
@@ -55,7 +59,7 @@
         </div>
       </div>
     </div>
-  </div>
+    
 
   <!-- Chart Section -->
   <div class="mt-5">
