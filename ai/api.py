@@ -6,7 +6,9 @@ from pydantic import BaseModel
 from datetime import datetime
 import numpy as np
 import pandas as pd
+import holidays  # Import the holidays library
 
+# Initialize Firebase Admin SDK
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -16,16 +18,26 @@ app = FastAPI()
 MODEL_PATH = "door_opening_anomaly_model.pkl"
 model = joblib.load(MODEL_PATH)
 
+# Vietnamese public holidays using the holidays library
+vietnam_holidays = holidays.Vietnam(years=[2024])  # Get holidays for a specific year
+
+def is_vietnamese_holiday(date):
+    """Check if the given date is a Vietnamese holiday."""
+    return date in vietnam_holidays
+
 def preprocess_timestamp(timestamp):
     timestamp = datetime.strptime(timestamp, "%B %d, %Y at %I:%M:%S %p UTC+7")
+    
     features = {
         "hour": timestamp.hour,
         "day_of_week": timestamp.weekday(),
         "month": timestamp.month,
         "year": timestamp.year,
         "day_of_year": timestamp.timetuple().tm_yday,
-        "time_diff": 0 
+        "time_diff": 0,
+        "is_holiday": is_vietnamese_holiday(timestamp)  # Check if it's a holiday
     }
+    
     return pd.DataFrame([features])
 
 class Event(BaseModel):
@@ -79,4 +91,3 @@ def fetch_data():
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching data: {str(e)}")
-
