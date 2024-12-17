@@ -22,10 +22,10 @@ const socketController = (socket) => {
 
   socket.on('chatMessage', async (data) => {
     try {
-      const { message, userId } = data;
+      const { message, userID } = data;
       const botResponse = await SocketService.processChatMessage({
         message,
-        userId,
+        userID,
       });
       socket.emit('botResponse', botResponse);
     } catch (error) {

@@ -20,6 +20,7 @@ class SocketService {
 
     if (toolCall === 'tool_calls') {
       const sensorData = await DeviceService.getSensorData(userId);
+      console.log(`#######sensorData: ${sensorData}`);
       if (!sensorData || sensorData.length === 0) {
         return 'No sensor data available for this user.';
       }
