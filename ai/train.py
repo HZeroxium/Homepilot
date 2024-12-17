@@ -7,11 +7,15 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import joblib
+import holidays  # Import the holidays library
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+
+# Vietnamese public holidays using the holidays library
+vietnam_holidays = holidays.Vietnam(years=[2024])  # Get holidays for a specific year
 
 def fetch_data_from_firestore():
     try:
@@ -48,6 +52,10 @@ def fetch_data_from_firestore():
         print(f"Error fetching data: {e}")
         return pd.DataFrame()
 
+def is_vietnamese_holiday(date):
+    """Check if the given date is a Vietnamese holiday."""
+    return date in vietnam_holidays
+
 def preprocess_data(df):
     historical_data = []
     for _, row in df.iterrows():
@@ -72,6 +80,9 @@ def preprocess_data(df):
     historical_df["day_of_year"] = historical_df["timestamp"].dt.dayofyear
     historical_df["time_diff"] = historical_df["timestamp"].diff().dt.total_seconds().fillna(0)
 
+    # Add a feature for Vietnamese holidays
+    historical_df["is_holiday"] = historical_df["timestamp"].apply(is_vietnamese_holiday)
+
     return historical_df
 
 def train_model():
@@ -81,7 +92,7 @@ def train_model():
         return
 
     df = preprocess_data(df)
-    X = df[["hour", "day_of_week", "month", "year", "day_of_year", "time_diff"]]
+    X = df[["hour", "day_of_week", "month", "year", "day_of_year", "time_diff", "is_holiday"]]
 
     # Using Isolation Forest for unsupervised anomaly detection
     model = IsolationForest(n_estimators=100, contamination=0.05, random_state=42) 
@@ -106,7 +117,8 @@ def predict_anomaly(model, timestamp):
         "month": timestamp.month,
         "year": timestamp.year,
         "day_of_year": timestamp.timetuple().tm_yday,
-        "time_diff": 0
+        "time_diff": 0,
+        "is_holiday": is_vietnamese_holiday(timestamp)  # Check if it's a holiday
     }
     df = pd.DataFrame([features])
     return model.predict(df)[0]
