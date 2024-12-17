@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import sgMail from '@sendgrid/mail';
 import Push from 'pushsafer-notifications';
-import { getHTMLTemplate } from '../utils/constants.js';
+import { getTemperatureHTMLTemplate } from '../utils/constants.js';
+import { getAnomalyHTMLTemplate } from '../utils/anomalyEmail.js';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const url = 'https://localhost:3000';
 
 class NotificationService {
   static async sendEmail({
+    template,
     to,
     from,
     subject,
@@ -18,7 +20,12 @@ class NotificationService {
     device_name,
     temperature,
   }) {
-    const html = getHTMLTemplate(device_name, temperature, url);
+    let html = '';
+    if (template === 'temperature') {
+      html = getTemperatureHTMLTemplate(device_name, temperature, url);
+    } else if (template === 'anomaly') {
+      html = getAnomalyHTMLTemplate(device_name, url);
+    }
     const msg = {
       to,
       from,

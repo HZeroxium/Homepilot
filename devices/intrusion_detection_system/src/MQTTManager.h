@@ -19,8 +19,8 @@ public:
 private:
   PubSubClient mqttClient;
   IntrusionSystem *system;
-  const char *data_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/intrusion/fgkBOaZZN3NXhmfbn01p/data";
-  const char *command_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/intrusion/fgkBOaZZN3NXhmfbn01p/command";
+  const char *data_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/intrusion/cuEsq3gIqYi3J3ZULZlu/data";
+  const char *command_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/intrusion/cuEsq3gIqYi3J3ZULZlu/command";
   const char *mqtt_server = "test.mosquitto.org";
 
   static void staticCallback(char *topic, byte *payload, unsigned int length); // Static callback
