@@ -38,8 +38,8 @@ void KeypadManager::handleKeypadInput(ServoManager *servoManager, NeoPixelManage
   char key = keypad.getKey(); // Read key press
   if (key)
   {
-    Serial.println(String("Key Pressed: ") + key);       // Debugging log
-    displayManager->showMessage(String(key).c_str(), 1); // Display the pressed key
+    Serial.println(String("Key Pressed: ") + key); // Debugging log
+    // displayManager->showMessage(String(key).c_str(), 3); // Display the pressed key
 
     // Handle 'C' to reset states
     if (key == 'C')
@@ -70,22 +70,28 @@ void KeypadManager::handleUnlockMode(char key, ServoManager *servoManager, NeoPi
   {
     if (servoManager->validatePIN(neoPixelManager, displayManager, tempPIN))
     {
-      displayManager->showMessage("Access Granted!");
-      neoPixelManager->setValid(); // Indicate success
+      servoManager->grantAccess(neoPixelManager, displayManager);
       mqttManager->publishData("direct", "grant");
       Serial.println("Access granted."); // Debug log
 
       // Reset display to default state after a delay
-      delay(2000); // Optional: Adjust delay as needed
-      displayManager->showMessage("Choose Mode (A/B):");
-      neoPixelManager->setReady(); // Reset NeoPixel to ready state
+      delay(3000); // Optional: Adjust delay as needed
+      displayManager->showMenu();
+      neoPixelManager->setWaiting();
     }
     else
     {
+      displayManager->clearScreen();
       displayManager->showMessage("Invalid PIN");
       neoPixelManager->setError(); // Indicate error
       mqttManager->publishData("direct", "deny");
       Serial.println("Invalid PIN entered."); // Debug log
+      delay(2000);                            // Optional: Adjust delay as needed
+      neoPixelManager->setWaiting();
+      displayManager->showMessage("Back to Menu...");
+      delay(2000); // Optional: Adjust delay as needed
+      displayManager->clearScreen();
+      displayManager->showMenu();
     }
     tempPIN = "";     // Clear PIN
     currentMode = ""; // Reset to default mode
@@ -97,7 +103,11 @@ void KeypadManager::handleUnlockMode(char key, ServoManager *servoManager, NeoPi
   }
   else
   {
-    displayManager->showMessage("Invalid Key"); // Invalid key
+    displayManager->showDigitErrorMessage(); // Invalid key
+    neoPixelManager->setError();             // Indicate error
+    delay(2000);                             // Optional: Adjust delay as needed
+    neoPixelManager->setWaiting();
+    displayManager->showUnlockMessage();
     Serial.println("Error: Invalid key in unlock mode.");
   }
 }
@@ -113,43 +123,45 @@ void KeypadManager::handleChangePINMode(char key, ServoManager *servoManager, Ne
     {
       if (servoManager->validatePIN(neoPixelManager, displayManager, tempPIN))
       {
+        displayManager->clearScreen();
         displayManager->showMessage("PIN Validated");
         neoPixelManager->setValid(); // Indicate success
+        delay(2000);                 // Optional: Adjust delay as needed
+        displayManager->clearScreen();
+        neoPixelManager->setWaiting();
         Serial.println("Current PIN validated. Ready to enter new PIN.");
-
-        delay(1500); // Optional: Briefly show "PIN Validated"
-        displayManager->showMessage("Enter New PIN:");
+        displayManager->showNewPINMessage();
         isEnteringNewPIN = true;
         tempPIN = ""; // Reset temp PIN for new input
       }
       else
       {
+        displayManager->clearScreen();
         displayManager->showMessage("Invalid Current PIN");
         neoPixelManager->setError(); // Indicate error
         Serial.println("Invalid current PIN entered.");
         tempPIN = "";
         currentMode = ""; // Reset to default mode
+        delay(2000);      // Optional: Adjust delay as needed
+        neoPixelManager->setWaiting();
+        displayManager->clearScreen();
+        displayManager->showMenu();
       }
     }
     else // Validate and save new PIN
     {
-      if (newPIN.length() >= 4)
-      {
-        servoManager->setValidPIN(newPIN);
-        displayManager->showMessage("PIN Updated!");
-        neoPixelManager->setValid(); // Indicate success
-        Serial.println("New PIN set successfully: " + newPIN);
-        newPIN = "";
-        isEnteringNewPIN = false;
-        currentMode = ""; // Reset to default mode
-      }
-      else
-      {
-        displayManager->showMessage("PIN Too Short");
-        neoPixelManager->setError(); // Indicate error
-        Serial.println("Error: New PIN too short.");
-        newPIN = ""; // Reset new PIN
-      }
+      displayManager->clearScreen();
+      servoManager->setValidPIN(newPIN);
+      displayManager->showMessage("PIN Updated!");
+      neoPixelManager->setValid(); // Indicate success
+      Serial.println("New PIN set successfully: " + newPIN);
+      newPIN = "";
+      isEnteringNewPIN = false;
+      currentMode = ""; // Reset to default mode
+      delay(2000);      // Optional: Adjust delay as needed
+      displayManager->clearScreen();
+      displayManager->showMenu();
+      neoPixelManager->setWaiting();
     }
   }
   else if (isdigit(key)) // Append digits to current PIN or new PIN
@@ -167,17 +179,26 @@ void KeypadManager::handleChangePINMode(char key, ServoManager *servoManager, Ne
   }
   else
   {
-    displayManager->showMessage("Invalid Key"); // Invalid key
+    displayManager->showDigitErrorMessage(); // Invalid key
+    neoPixelManager->setError();             // Indicate error
+    delay(2000);                             // Optional: Adjust delay as needed
+    neoPixelManager->setWaiting();
+    displayManager->showChangePINMessage();
+
     Serial.println("Error: Invalid key in change PIN mode.");
   }
 }
 
 void KeypadManager::resetState(String &currentMode, String &tempPIN, NeoPixelManager *neoPixelManager)
 {
-  currentMode = "";            // Reset mode
-  tempPIN = "";                // Clear PIN
-  neoPixelManager->setReady(); // Indicate system ready
-  displayManager->showMessage("System Ready");
+  currentMode = "";              // Reset mode
+  tempPIN = "";                  // Clear PIN
+  neoPixelManager->setWaiting(); // Indicate system ready
+  displayManager->clearScreen(); // Clear display
+  displayManager->showMessage("System Reset");
+  delay(2000);                   // Optional: Adjust delay as needed
+  displayManager->clearScreen(); // Clear display
+  displayManager->showMenu();    // Show menu
   Serial.println("System reset to default state.");
 }
 
@@ -186,15 +207,15 @@ void KeypadManager::handleModeSelection(char key, String &currentMode, NeoPixelM
   if (key == 'A')
   {
     currentMode = "A"; // Set mode to Unlock
-    displayManager->showMessage("Enter PIN:");
-    neoPixelManager->setReady(); // Indicate ready state
+    displayManager->showUnlockMessage();
+    neoPixelManager->setWaiting(100); // Indicate waiting state
     Serial.println("Mode set to Unlock.");
   }
   else if (key == 'B')
   {
     currentMode = "B"; // Set mode to Change PIN
-    displayManager->showMessage("Enter Current PIN:");
-    neoPixelManager->setReady(); // Indicate ready state
+    displayManager->showChangePINMessage();
+    neoPixelManager->setWaiting(100); // Indicate waiting state
     Serial.println("Mode set to Change PIN.");
   }
   else

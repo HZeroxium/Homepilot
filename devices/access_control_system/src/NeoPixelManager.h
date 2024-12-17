@@ -8,10 +8,11 @@ class NeoPixelManager
 {
 public:
   void init();
-  void setColor(uint8_t r, uint8_t g, uint8_t b);
-  void setReady();
-  void setError();
-  void setValid();
+  void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t delayTime = 0);
+  void setReady(uint8_t delayTime = 0);
+  void setError(uint8_t delayTime = 0);
+  void setValid(uint8_t delayTime = 0);
+  void setWaiting(uint8_t delayTime = 0);
 
 private:
   const uint8_t LED_PIN = 17;

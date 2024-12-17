@@ -40,7 +40,7 @@ void setup()
   displayManager.showMessage("System Booting...");
 
   neoPixelManager.init();
-  neoPixelManager.setReady();
+  neoPixelManager.setReady(100);
 
   servoManager.init();
 
@@ -49,7 +49,9 @@ void setup()
   wifiManager.connect();
   mqttManager.init(wifiManager.getClient(), &servoManager, &displayManager, &neoPixelManager);
 
-  displayManager.showMessage("Enter PIN:");
+  neoPixelManager.setWaiting(50);
+
+  displayManager.showMenu();
 }
 
 /**
