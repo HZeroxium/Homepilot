@@ -18,7 +18,7 @@ class MqttService {
     }
 
     const { status: deviceStatus, data: deviceData = {} } = payload;
-
+    deviceData.status = deviceStatus || deviceData.status || 'offline';
     // Update device status
     if (deviceStatus) {
       await device.updateStatus(deviceStatus);
