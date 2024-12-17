@@ -1,20 +1,23 @@
 <!-- views/login.ejs -->
-<% title = 'Đăng Nhập' %> <% title = 'Đăng Nhập' %>
+<% title = 'Đăng Nhập' %>
 
 <main class="container my-5">
   <h2 class="text-primary text-center mb-4">
     <i class="bi bi-box-arrow-in-right"></i> Đăng Nhập
   </h2>
+
+  <!-- Alert Container -->
+  <div id="alert-container" class="mb-4"></div>
+
   <form
-    action="/login"
-    method="POST"
+    id="loginForm"
     class="mx-auto bg-light shadow p-4 rounded"
     style="max-width: 400px"
   >
     <div class="mb-3">
-      <label for="email" class="form-label"
-        ><i class="bi bi-envelope"></i> Email:</label
-      >
+      <label for="email" class="form-label">
+        <i class="bi bi-envelope"></i> Email:
+      </label>
       <input
         type="email"
         name="email"
@@ -26,9 +29,9 @@
     </div>
 
     <div class="mb-3">
-      <label for="password" class="form-label"
-        ><i class="bi bi-lock"></i> Mật khẩu:</label
-      >
+      <label for="password" class="form-label">
+        <i class="bi bi-lock"></i> Mật khẩu:
+      </label>
       <input
         type="password"
         name="password"
@@ -43,8 +46,53 @@
       <i class="bi bi-box-arrow-right"></i> Đăng Nhập
     </button>
   </form>
+
   <p class="text-center mt-3">
     Bạn chưa có tài khoản?
     <a href="/register" class="text-decoration-none text-primary">Đăng ký</a>
   </p>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const alertContainer = document.getElementById('alert-container');
+      alertContainer.innerHTML = ''; // Clear previous alerts
+
+      // Get form data
+      const formData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+      };
+
+      try {
+        // Submit login request via Axios
+        const response = await axios.post('/login', formData);
+
+        // Display success message
+        alertContainer.innerHTML = `
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle-fill"></i> ${response.data.message}
+        </div>
+      `;
+
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = response.data.redirectUrl;
+        }, 3000);
+      } catch (error) {
+        // Display error message
+        alertContainer.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle-fill"></i> ${
+            error.response?.data?.message || 'Đã xảy ra lỗi! Vui lòng thử lại.'
+          }
+        </div>
+      `;
+      }
+    });
+</script>

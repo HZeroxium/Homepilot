@@ -6,16 +6,16 @@ import User from '../models/user.model.js';
 class AuthService {
   static async registerUser(displayName, email, password, confirmPassword) {
     if (!displayName || !email || !password || !confirmPassword) {
-      throw new Error('All fields are required.');
+      throw new Error('All fields are required. Please try again.');
     }
 
     if (password !== confirmPassword) {
-      throw new Error('Passwords do not match.');
+      throw new Error('Passwords do not match. Please try again.');
     }
 
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
-      throw new Error('Email is already in use.');
+      throw new Error('Email is already in use. Please use a different email.');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -33,8 +33,12 @@ class AuthService {
     }
 
     const user = await User.findByEmail(email);
-    if (!user || !(await user.comparePassword(password))) {
-      throw new Error('Incorrect email or password.');
+
+    if (!user)
+      throw new Error('Incorrect email. Please try again or register.');
+
+    if (!(await user.comparePassword(password))) {
+      throw new Error('Incorrect password. Please try again.');
     }
 
     return user;

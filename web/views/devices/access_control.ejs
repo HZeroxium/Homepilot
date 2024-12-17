@@ -1,12 +1,20 @@
 <% title = 'Hệ Thống Kiểm Soát Truy Cập' %>
 
 <main class="container mt-5">
+  <!-- Back to Dashboard Button -->
+  <div class="mb-4">
+    <a href="/dashboard" class="btn btn-secondary">
+      <i class="bi bi-arrow-left-circle"></i> Quay về Dashboard
+    </a>
+  </div>
+
   <h2 class="text-primary mb-4">
     <i class="bi bi-door-closed"></i> Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
+  <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
   <p>
     Trạng thái cửa:
-    <span class="fw-bold"><%= device.data.doorStatus || 'Unknown' %></span>
+    <span class="fw-bold"><%= device.data.status || 'Unknown' %></span>
   </p>
   <form
     action="/devices/access_control/action"
