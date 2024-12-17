@@ -33,6 +33,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+  const parsedUserID = <%- JSON.stringify(userID) %>;
   const socket = io();
   const messagesContainer = document.getElementById('messages');
   const userMessageInput = document.getElementById('userMessage');
@@ -58,7 +59,7 @@
       // Emit user message to server
       socket.emit('chatMessage', {
         message: message,
-        userID: '<%= userID %>',
+        userId: parsedUserID,
       });
 
       // Display user message in UI
