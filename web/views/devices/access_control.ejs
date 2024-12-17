@@ -11,11 +11,8 @@
   <h2 class="text-primary mb-4">
     <i class="bi bi-door-closed"></i> Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
+  <h4 class="text-primary mb-4">ID thiết bị: (debug) <%= device.uid %></h4>
   <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
-  <p>
-    Trạng thái cửa:
-    <span class="fw-bold"><%= device.data.status || 'Unknown' %></span>
-  </p>
   <form
     action="/devices/access_control/action"
     method="POST"

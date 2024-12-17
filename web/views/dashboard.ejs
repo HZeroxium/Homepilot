@@ -34,12 +34,6 @@
               <i class="bi bi-hdd-fill"></i> <%= device.name %>
             </h5>
             <p class="card-text">Loại: <%= device.type %></p>
-            <p class="card-text">
-              Trạng thái: 
-              <span class="badge <%= device.status === 'Online' ? 'bg-success' : 'bg-secondary' %>">
-                <%= device.status %>
-              </span>
-            </p>
             <a href="/devices/<%= device.type %>" class="btn btn-primary">
               <i class="bi bi-tools"></i> Quản lý
             </a>

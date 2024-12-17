@@ -59,7 +59,7 @@ void MQTTManager::handleCallback(char *topic, byte *payload, unsigned int length
   char message[length + 1];
   strncpy(message, (char *)payload, length);
   message[length] = '\0';
-
+  Serial.println("Received message: " + String(message));
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, message);
   if (error)
@@ -70,10 +70,17 @@ void MQTTManager::handleCallback(char *topic, byte *payload, unsigned int length
   }
 
   String action = doc["action"];
-  String params = doc["parameters"] | "";
-  Serial.println("Received MQTT Command: " + action + " with parameters: " + params);
+  String newPassword = "";
 
-  processCommand(action, params);
+  // Trích xuất giá trị của newPassword từ parameters nếu có
+  if (doc["parameters"].containsKey("newPassword"))
+  {
+    newPassword = doc["parameters"]["newPassword"].as<String>();
+  }
+
+  Serial.println("Received MQTT Command: " + action + " with newPassword: " + newPassword);
+
+  processCommand(action, newPassword);
 }
 
 /**
@@ -97,14 +104,16 @@ void MQTTManager::processCommand(const String &action, const String &params)
   {
     displayManager->showMessage("PIN Updated");
     servoManager->setValidPIN(params);
+    Serial.println("New PIN: " + servoManager->getValidPIN());
     // publishData("PIN Updated");
   }
 }
 
-
 void MQTTManager::publishData(const char *method, const char *status)
 {
   JsonDocument doc;
+  Serial.println(method);
+  Serial.println(status);
   doc["data"].to<JsonObject>()["method"] = method;
   doc["status"] = status;
 
