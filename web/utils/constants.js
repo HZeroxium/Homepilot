@@ -11,7 +11,7 @@ export const tools = [
   },
 ];
 
-export const getHTMLTemplate = (device_name, temperature, url) => {
+export const getTemperatureHTMLTemplate = (device_name, temperature, url) => {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -148,5 +148,5 @@ export const getHTMLTemplate = (device_name, temperature, url) => {
 
 export default {
   tools,
-  getHTMLTemplate,
+  getTemperatureHTMLTemplate,
 };

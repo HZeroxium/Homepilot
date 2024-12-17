@@ -14,6 +14,7 @@
   </h2>
   <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
 
+
   <div class="row g-4">
     <!-- Distance and Motion -->
     <div class="col-md-6">
@@ -212,21 +213,21 @@
           if (data.success) {
             // alert('Khoảng cách đã được cập nhật!');
             // Optionally, you can update the chart or UI with the new distance here
-            successMessage.style.display = 'block';
+            successMessage.style.display = 'none'
             // alert('good')
           } else {
-            errorMessage.style.display = 'block';
+            errorMessage.style.display = 'none'
             // alert('not good')
           }
         })
         .catch(error => {
           console.error('Error updating distance:', error);
-          errorMessage.style.display = 'block';
+          errorMessage.style.display = 'none';
           // alert('error')
         });
       } else {
         // Display error message if input is invalid
-        errorMessage.style.display = 'block';
+        errorMessage.style.display = 'none';
         // alert('what')
       }
     });

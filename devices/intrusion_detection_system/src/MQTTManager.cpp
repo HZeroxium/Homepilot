@@ -64,6 +64,8 @@ void MQTTManager::handleCallback(char *topic, byte *payload, unsigned int length
   strncpy(message, (char *)payload, length);
   message[length] = '\0';
 
+  Serial.println("Received message: " + String(message));
+
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, message);
   if (error)
@@ -74,7 +76,7 @@ void MQTTManager::handleCallback(char *topic, byte *payload, unsigned int length
   }
 
   String action = doc["action"];
-  String params = doc["parameters"] | "";
+  String params = doc["parameters"]["newDistance"] | "";
   Serial.println("Received MQTT Command: " + action + " with parameters: " + params);
 
   processCommand(action, params);

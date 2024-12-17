@@ -18,7 +18,9 @@ class MqttService {
     }
 
     const { status: deviceStatus, data: deviceData = {} } = payload;
+
     deviceData.status = deviceStatus || deviceData.status || 'offline';
+
     // Update device status
     if (deviceStatus) {
       await device.updateStatus(deviceStatus);
@@ -76,6 +78,8 @@ class MqttService {
       const data = await response.json();
       const { prediction } = data;
 
+      console.log('Anomaly prediction:', prediction);
+
       return prediction === 'anomaly';
     } catch (error) {
       console.error('Error checking anomaly:', error);
@@ -91,7 +95,10 @@ class MqttService {
 
     const isAnomaly = await this.checkAnomaly();
 
-    if (status === 'granted' && isAnomaly) {
+    console.log(deviceData, isAnomaly);
+
+    if (status === 'grant' && isAnomaly) {
+      console.log('!!!!!!Anomaly detected! Sending notifications...');
       await NotificationService.sendDevicesNotification({
         message: 'Alert! Anomaly detected',
         title: 'Notification',
@@ -99,6 +106,7 @@ class MqttService {
       });
 
       await NotificationService.sendEmail({
+        template: 'anomaly',
         to: process.env.EMAIL_RECEIVER,
         from: process.env.EMAIL_SENDER,
         subject: '[HOMEPILOT] NOTIFICATION',
@@ -130,6 +138,7 @@ class MqttService {
         });
 
         await NotificationService.sendEmail({
+          template: 'temperature',
           to: process.env.EMAIL_RECEIVER,
           from: process.env.EMAIL_SENDER,
           subject: '[HOMEPILOT] NOTIFICATION',
@@ -156,27 +165,7 @@ class MqttService {
 
   static async handleIntrusionDevice(device, deviceData, userId) {
     const { distance = 0, motion = false } = deviceData;
-
-    const safeDistance = 20;
-
-    // Check for motion and send notifications
-    if (motion && distance <= safeDistance) {
-      await NotificationService.sendDevicesNotification({
-        message: 'Alert! Motion detected',
-        title: 'Notification',
-        deviceId: process.env.PUSHSAFER_DEVICE_ID,
-      });
-
-      await NotificationService.sendEmail({
-        to: process.env.EMAIL_RECEIVER,
-        from: process.env.EMAIL_SENDER,
-        subject: '[HOMEPILOT] NOTIFICATION',
-        text: 'Motion detected!',
-        device_name: device.name,
-      });
-      console.log('Alert! Motion detected');
-      deviceData.alertStatus = true;
-    }
+    console.log('Intrusion device data:', deviceData);
 
     // Save historical data
     const historicalData = {
