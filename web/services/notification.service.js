@@ -45,11 +45,12 @@ class NotificationService {
   static async sendDevicesNotification({
     message,
     title = 'Notification',
-    deviceId = process.env.PUSHSAFER_DEVICE_ID,
+    deviceId,
+    userPrivateKey,
   }) {
     // Initialize Pushsafer with the private key
     const pushClient = new Push({
-      k: process.env.PUSHSAFER_PRIVATE_KEY, // Private key from .env file
+      k: userPrivateKey, // Private key from .env file
       debug: true,
     });
 

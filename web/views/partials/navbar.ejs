@@ -37,10 +37,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <span class="nav-link">
-              <i class="bi bi-person-circle"></i> <!-- Bootstrap Icon for User -->
-              Hi, <%= user.displayName %>
-            </span>
+            <a href="/profile" class="nav-link">
+              <span class="nav-link">
+                <i class="bi bi-person-circle"></i> <!-- Bootstrap Icon for User -->
+                Hi, <%= user.displayName %>
+              </span>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout">

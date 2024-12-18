@@ -1,6 +1,7 @@
 // services/mqttService.js
 
 import Device from '../models/device.model.js';
+import User from '../models/user.model.js';
 import NotificationService from './notification.service.js';
 
 class MqttService {
@@ -97,17 +98,20 @@ class MqttService {
 
     console.log(deviceData, isAnomaly);
 
+    const user = await User.findById(userId)
+
     if (status === 'grant' && isAnomaly) {
       console.log('!!!!!!Anomaly detected! Sending notifications...');
       await NotificationService.sendDevicesNotification({
         message: 'Alert! Anomaly detected',
         title: 'Notification',
-        deviceId: process.env.PUSHSAFER_DEVICE_ID,
+        deviceId: user.phoneDeviceID,
+        userPrivateKey: user.phonePrivateKey,
       });
 
       await NotificationService.sendEmail({
         template: 'anomaly',
-        to: process.env.EMAIL_RECEIVER,
+        to: user.email,
         from: process.env.EMAIL_SENDER,
         subject: '[HOMEPILOT] NOTIFICATION',
         text: 'Anomaly detected!',
@@ -130,16 +134,18 @@ class MqttService {
     // Check for high temperature/humidity and send notifications
     if (temperature > 50 || humidity > 80) {
       const currentTime = Date.now();
+      const user = await User.findById(userId)
       if (currentTime - this.lastNotificationTime >= 10 * 60 * 1000) {
         await NotificationService.sendDevicesNotification({
           message: 'Alert! Temperature or humidity is too high',
           title: 'Notification',
-          deviceId: process.env.PUSHSAFER_DEVICE_ID,
+          deviceId: user.phoneDeviceID,
+          userPrivateKey: user.phonePrivateKey,
         });
 
         await NotificationService.sendEmail({
           template: 'temperature',
-          to: process.env.EMAIL_RECEIVER,
+          to: user.email,
           from: process.env.EMAIL_SENDER,
           subject: '[HOMEPILOT] NOTIFICATION',
           text: 'High temperature or humidity detected!',
