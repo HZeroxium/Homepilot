@@ -11,7 +11,7 @@
   <h2 class="text-primary mb-4">
     <i class="bi bi-door-closed"></i> Quản Lý Hệ Thống Kiểm Soát Truy Cập
   </h2>
-  <h4 class="text-primary mb-4">ID thiết bị: (debug) <%= device.uid %></h4>
+  <!-- <h4 class="text-primary mb-4">ID thiết bị: (debug) <%= device.uid %></h4> -->
   <h5 class="text-primary mb-4">Tên thiết bị: <%= device.name %></h5>
   <form
     action="/devices/access_control/action"
@@ -21,13 +21,10 @@
     <button type="submit" name="action" value="unlock" class="btn btn-primary">
       <i class="bi bi-unlock"></i> Mở Khóa
     </button>
-    <button type="submit" name="action" value="lock" class="btn btn-secondary">
-      <i class="bi bi-lock-fill"></i> Khóa
-    </button>
+    <a href="/devices/access_control/change_password" class="btn btn-warning">
+      <i class="bi bi-key"></i> Thay Đổi Mật Khẩu
+    </a>
   </form>
-  <a href="/devices/access_control/change_password" class="btn btn-warning">
-    <i class="bi bi-key"></i> Thay Đổi Mật Khẩu
-  </a>
 
   <!-- Chart Section -->
   <div class="mt-5">

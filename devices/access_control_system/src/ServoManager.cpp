@@ -27,28 +27,19 @@ void ServoManager::init()
  */
 int ServoManager::validatePIN(NeoPixelManager *neoPixelManager, DisplayManager *displayManager, String inputPIN)
 {
-  if (inputPIN != validPIN)
-  {
-    displayManager->showMessage("Invalid PIN");
-    neoPixelManager->setError();
-    delay(2000);
-    displayManager->showMessage("Enter PIN:");
-    neoPixelManager->setReady();
-    return 0;
-  }
-  this->grantAccess(neoPixelManager, displayManager);
-  return 1;
+  return inputPIN == validPIN;
 }
 
 void ServoManager::grantAccess(NeoPixelManager *neoPixelManager, DisplayManager *displayManager)
 {
+  displayManager->clearScreen();
   displayManager->showMessage("Access Granted");
   neoPixelManager->setValid();
   myServo.write(90); // Unlock position
   delay(5000);       // Keep door unlocked for 5 seconds
   myServo.write(0);  // Lock again
   displayManager->showMessage("Door Locked");
-  neoPixelManager->setReady();
+  neoPixelManager->setWaiting();
 }
 
 String ServoManager::getValidPIN()

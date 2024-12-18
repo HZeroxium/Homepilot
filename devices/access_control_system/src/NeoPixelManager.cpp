@@ -25,44 +25,32 @@ void NeoPixelManager::init()
  * @param[in] g The green component of the color.
  * @param[in] b The blue component of the color.
  */
-void NeoPixelManager::setColor(uint8_t r, uint8_t g, uint8_t b)
+void NeoPixelManager::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t delayTime)
 {
   for (int i = 0; i < strip.numPixels(); i++)
   {
     strip.setPixelColor(i, strip.Color(r, g, b));
+    delay(delayTime);
   }
   strip.show();
 }
 
-/**
- * @brief Sets the NeoPixel strip to indicate system readiness.
- *
- * This function sets the color of all pixels in the NeoPixel strip to blue,
- * which indicates that the system is ready.
- */
-void NeoPixelManager::setReady()
+void NeoPixelManager::setReady(uint8_t delayTime)
 {
-  setColor(0, 0, 255); // Blue indicates system ready
+  setColor(0, 0, 255, delayTime); // Blue indicates system ready
 }
 
-/**
- * @brief Sets the NeoPixel strip to indicate an error.
- *
- * This function sets the color of all pixels in the NeoPixel strip to red,
- * which indicates that an error has occurred.
- */
-void NeoPixelManager::setError()
+void NeoPixelManager::setError(uint8_t delayTime)
 {
-  setColor(255, 0, 0); // Red indicates error
+  setColor(255, 0, 0, delayTime); // Red indicates error
 }
 
-/**
- * @brief Sets the NeoPixel strip to indicate valid operation.
- *
- * This function sets the color of all pixels in the NeoPixel strip to green,
- * which indicates that the system is operating correctly.
- */
-void NeoPixelManager::setValid()
+void NeoPixelManager::setValid(uint8_t delayTime)
 {
-  setColor(0, 255, 0); // Green indicates valid
+  setColor(0, 255, 0, delayTime); // Green indicates valid
+}
+
+void NeoPixelManager::setWaiting(uint8_t delayTime)
+{
+  setColor(255, 255, 0, delayTime); // Yellow indicates warning
 }

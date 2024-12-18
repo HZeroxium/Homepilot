@@ -91,6 +91,9 @@ void MQTTManager::processCommand(const String &action, const String &params)
   if (action == "unlock")
   {
     servoManager->grantAccess(neoPixelManager, displayManager);
+    displayManager->clearScreen();
+    delay(2000);
+    displayManager->showMenu();
     publishData("remote", "grant");
   }
   else if (action == "lock")
@@ -102,7 +105,10 @@ void MQTTManager::processCommand(const String &action, const String &params)
   }
   else if (action == "update_pin")
   {
+    displayManager->clearScreen();
     displayManager->showMessage("PIN Updated");
+    delay(2000);
+    displayManager->showMenu();
     servoManager->setValidPIN(params);
     Serial.println("New PIN: " + servoManager->getValidPIN());
     // publishData("PIN Updated");
