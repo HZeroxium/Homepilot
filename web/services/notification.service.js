@@ -48,6 +48,10 @@ class NotificationService {
     deviceId,
     userPrivateKey,
   }) {
+    if (deviceId === undefined || userPrivateKey === undefined) {
+      console.log('Device ID and user private key are required.');
+      return;
+    }
     // Initialize Pushsafer with the private key
     const pushClient = new Push({
       k: userPrivateKey, // Private key from .env file
