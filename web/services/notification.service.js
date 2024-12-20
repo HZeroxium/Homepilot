@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
-import sgMail from '@sendgrid/mail';
+// import sgMail from '@sendgrid/mail';
 import Push from 'pushsafer-notifications';
 import { getTemperatureHTMLTemplate } from '../utils/constants.js';
 import { getAnomalyHTMLTemplate } from '../utils/anomalyEmail.js';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const url = 'https://localhost:3000';
 
@@ -21,22 +22,37 @@ class NotificationService {
     temperature,
   }) {
     let html = '';
+    
+    // Generate HTML content based on the template
     if (template === 'temperature') {
-      html = getTemperatureHTMLTemplate(device_name, temperature, url);
+      html = getTemperatureHTMLTemplate(device_name, temperature);
     } else if (template === 'anomaly') {
-      html = getAnomalyHTMLTemplate(device_name, url);
+      html = getAnomalyHTMLTemplate(device_name);
     }
-    const msg = {
-      to,
-      from,
-      subject,
-      text,
-      html,
+
+    // Configure the Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587, // Use 465 if you prefer SSL
+      secure: false, // Set to true for port 465
+      auth: {
+        user: 'homepilothcmus@gmail.com', // Replace with your Gmail address
+        pass: 'obqi lfkd mvai wlxb', // Use an App Password if 2FA is enabled
+      },
+    });
+
+    const mailOptions = {
+      from, // Sender address
+      to, // Recipient address
+      subject, // Subject line
+      text, // Plain text body
+      html, // HTML body
     };
 
     try {
-      await sgMail.send(msg);
-      console.log('Email sent');
+      // Send email using the transporter
+      await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully');
     } catch (error) {
       console.error('Error sending email:', error);
     }
@@ -83,14 +99,5 @@ class NotificationService {
     });
   }
 }
-
-// Send the email example
-// sendEmail(
-//   to='hctuankiet243@gmail.com',
-//   from='hctkiet22@clc.fitus.edu.vn',
-//   subject='[HOMEPILOT] NOTIFICATION',
-//   text='HomePilot Notification', // Plain text fallback
-//   html=htmlTemplate // HTML content
-// );
 
 export default NotificationService;

@@ -5,7 +5,7 @@ import User from '../models/user.model.js';
 import NotificationService from './notification.service.js';
 
 class MqttService {
-  static lastNotificationTime = 0;
+  static lastNotificationTimes = new Map();
 
   static async handleDeviceData({ topic, payload }) {
     const [home, userId, deviceType, deviceId, messageType] = topic.split('/');
@@ -47,7 +47,7 @@ class MqttService {
   }
 
   static async checkAnomaly() {
-    try {
+    try {      
       // Create a timestamp in the format: "December 7, 2024 at 7:45:12 AM UTC+7"
       const timestamp = new Intl.DateTimeFormat('en-US', {
         year: 'numeric',
@@ -88,36 +88,49 @@ class MqttService {
     }
   }
 
+  static async shouldSendNotification(deviceId) {
+    const currentTime = Date.now();
+    const lastTime = this.lastNotificationTimes.get(deviceId) || 0;
+
+    // Check if 5 minutes have passed
+    if (currentTime - lastTime >= 5 * 60 * 1000) {
+      this.lastNotificationTimes.set(deviceId, currentTime);
+      return true;
+    }
+    return false;
+  }
+
   static async handleAccessControlDevice(device, deviceData, userId) {
     console.log('Access control device data:', deviceData);
     const { method = '', status = '' } = deviceData;
 
     // check if status is granted, send notification
-
     const isAnomaly = await this.checkAnomaly();
 
     console.log(deviceData, isAnomaly);
 
-    const user = await User.findById(userId)
+    const user = await User.findById(userId);
 
     if (status === 'grant' && isAnomaly) {
-      console.log('!!!!!!Anomaly detected! Sending notifications...');
-      await NotificationService.sendDevicesNotification({
-        message: 'Alert! Anomaly detected',
-        title: 'Notification',
-        deviceId: user.phoneDeviceID,
-        userPrivateKey: user.phonePrivateKey,
-      });
+      if (await this.shouldSendNotification(device.id)) {
+        console.log('!!!!!!Anomaly detected! Sending notifications...');
+        await NotificationService.sendDevicesNotification({
+          message: 'Alert! Anomaly detected',
+          title: 'Notification',
+          deviceId: user.phoneDeviceID,
+          userPrivateKey: user.phonePrivateKey,
+        });
 
-      await NotificationService.sendEmail({
-        template: 'anomaly',
-        to: user.email,
-        from: process.env.EMAIL_SENDER,
-        subject: '[HOMEPILOT] NOTIFICATION',
-        text: 'Anomaly detected!',
-        device_name: device.name,
-      });
-      console.log('Alert! Anomaly detected');
+        await NotificationService.sendEmail({
+          template: 'anomaly',
+          to: user.email,
+          from: process.env.EMAIL_SENDER,
+          subject: '[HOMEPILOT] NOTIFICATION',
+          text: 'Anomaly detected!',
+          device_name: device.name,
+        });
+        console.log('Alert! Anomaly detected');
+      }
     }
 
     // save historical data
@@ -133,9 +146,8 @@ class MqttService {
 
     // Check for high temperature/humidity and send notifications
     if (temperature > 50 || humidity > 80) {
-      const currentTime = Date.now();
-      const user = await User.findById(userId)
-      if (currentTime - this.lastNotificationTime >= 10 * 60 * 1000) {
+      const user = await User.findById(userId);
+      if (await this.shouldSendNotification(device.id)) {
         await NotificationService.sendDevicesNotification({
           message: 'Alert! Temperature or humidity is too high',
           title: 'Notification',
@@ -145,15 +157,13 @@ class MqttService {
 
         await NotificationService.sendEmail({
           template: 'temperature',
-          to: user.email,
+          to: "hc",
           from: process.env.EMAIL_SENDER,
           subject: '[HOMEPILOT] NOTIFICATION',
           text: 'High temperature or humidity detected!',
           device_name: device.name,
           temperature,
         });
-
-        this.lastNotificationTime = currentTime;
       }
       console.log('Alert! Temperature or humidity is too high');
       deviceData.alertStatus = true;
