@@ -95,9 +95,9 @@ class User {
         data.passwordHash,
         data.displayName,
         data.createdAt,
-        data.phoneDeviceID,
-        data.phonePrivateKey,
-        data.fcmToken
+        data.phoneDeviceID || null,
+        data.phonePrivateKey || null,
+        data.fcmToken || null
       );
     } catch (error) {
       console.error("Error finding user by ID:", error);
