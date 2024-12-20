@@ -21,7 +21,7 @@ private:
   FireAlarmSystem *system;
   const char *data_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/fire_smoke/MQZlh6xSAbqeoAxGmFak/data";
   const char *command_topic = "home/0765b6c9-3475-4575-840f-f559c2bd7cf8/fire_smoke/MQZlh6xSAbqeoAxGmFak/command";
-  const char *mqtt_server = "test.mosquitto.org";
+  const char *mqtt_server = "broker.hivemq.com";
 
   static void staticCallback(char *topic, byte *payload, unsigned int length); // Static callback
   void handleCallback(char *topic, byte *payload, unsigned int length);        // Instance method
