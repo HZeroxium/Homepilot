@@ -1,0 +1,117 @@
+<!-- views/profile.ejs -->
+<% title = 'Hồ sơ cá nhân' %>
+
+<main class="container my-5">
+  <h2 class="text-primary text-center mb-4">
+    <i class="bi bi-person"></i> Hồ Sơ Cá Nhân
+  </h2>
+
+  <!-- Alert Container -->
+  <div id="alert-container" class="mb-4"></div>
+
+  <form
+    id="profileForm"
+    class="mx-auto bg-light shadow p-4 rounded"
+    style="max-width: 400px"
+  >
+    <!-- Email -->
+    <div class="mb-3">
+      <label for="email" class="form-label">
+        <i class="bi bi-envelope"></i> Email:
+      </label>
+      <input
+        type="email"
+        name="newEmail"
+        id="email"
+        class="form-control"
+        placeholder="Nhập email của bạn"
+        value="<%= user.email %>"
+        readonly
+      />
+    </div>
+
+    <!-- Phone Private Key -->
+    <div class="mb-3">
+      <label for="phonePrivateKey" class="form-label">
+        <i class="bi bi-key"></i> Mã khóa điện thoại:
+      </label>
+      <input
+        type="text"
+        name="newPhonePrivateKey"
+        id="phonePrivateKey"
+        class="form-control"
+        placeholder="Nhập mã khóa điện thoại của bạn"
+        required
+      />
+    </div>
+
+    <!-- Phone Device ID -->
+    <div class="mb-3">
+      <label for="phoneDeviceID" class="form-label">
+        <i class="bi bi-phone"></i> ID thiết bị điện thoại:
+      </label>
+      <input
+        type="text"
+        name="newPhoneDeviceID"
+        id="phoneDeviceID"
+        class="form-control"
+        placeholder="Nhập ID thiết bị điện thoại của bạn"
+        required
+      />
+    </div>
+
+    <!-- Save Button -->
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="bi bi-save"></i> Lưu Thay Đổi
+    </button>
+  </form>
+
+  <p class="text-center mt-3">
+    <a href="/profile" class="text-decoration-none text-primary">Trở lại hồ sơ</a>
+  </p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document
+    .getElementById('profileForm')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent default form submission
+
+      const alertContainer = document.getElementById('alert-container');
+      alertContainer.innerHTML = ''; // Clear previous alerts
+
+      // Get form data
+      const formData = {
+        newEmail: document.getElementById('email').value,
+        newPhonePrivateKey: document.getElementById('phonePrivateKey').value,
+        newPhoneDeviceID: document.getElementById('phoneDeviceID').value,
+      };
+
+      try {
+        // Submit profile update request via Axios
+        const response = await axios.post('/profile/update_profile', formData);
+
+        // Display success message
+        alertContainer.innerHTML = `
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle-fill"></i> Update profile successfully!
+        </div>
+      `;
+
+        // Redirect to profile page
+        setTimeout(() => {
+          window.location.href = '/profile';
+        }, 3000);
+      } catch (error) {
+        // Display error message
+        alertContainer.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle-fill"></i> ${
+            error.response?.data?.message || 'Đã xảy ra lỗi! Vui lòng thử lại.'
+          }
+        </div>
+      `;
+      }
+    });
+</script>

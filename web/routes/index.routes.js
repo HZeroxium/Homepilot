@@ -5,6 +5,7 @@ import authRoutes from './auth.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
 import devicesRoutes from './devices.routes.js';
 import chatbotRoutes from './chatbot.routes.js';
+import profileRoutes from './profile.routes.js';
 import { ensureAuthenticated } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.use('/', authRoutes);
 router.use('/dashboard', ensureAuthenticated, dashboardRoutes);
 router.use('/devices', ensureAuthenticated, devicesRoutes);
 router.use('/chatbot', ensureAuthenticated, chatbotRoutes);
+router.use('/profile', ensureAuthenticated, profileRoutes);
 
 // Handle non-existent routes
 router.use((req, res) => {

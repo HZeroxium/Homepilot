@@ -29,6 +29,8 @@ class SocketService {
           return `Device: ${data.name}, Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%, Light: ${data.light} lux`;
         } else if (data.type === 'intrusion') {
           return `Device: ${data.name}, Distance: ${data.distance} cm, Motion: ${data.motion ? 'Detected' : 'Not Detected'}`;
+        } else if (data.type === 'access_control') {
+          return `Device: ${data.name}, Status: ${data.status}`;
         } else {
           return `Device: ${data.name}, Type: ${data.type}`;
         }

@@ -39,7 +39,7 @@ void MQTTManager::loop()
   if (millis() - lastSend > 5000)
   {
     lastSend = millis();
-    publishData("direct", "hello");
+    publishData("direct", "normal");
   }
 }
 

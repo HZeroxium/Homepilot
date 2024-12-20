@@ -101,6 +101,7 @@ class DeviceService {
           name: device.name,
           type: device.type,
           temperature: historicalData[0]?.temperature || null,
+          light: historicalData[0]?.light || null,
           humidity: historicalData[0]?.humidity || null,
           timestamp: historicalData[0]?.timestamp || null,
         };

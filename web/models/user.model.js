@@ -5,12 +5,15 @@ import bcrypt from "bcryptjs";
 const usersCollection = db.collection("users");
 
 class User {
-  constructor(uid, email, passwordHash, displayName, createdAt) {
+  constructor(uid, email, passwordHash, displayName, createdAt, phoneDeviceID, phonePrivateKey, fcmToken) {
     this.uid = uid;
     this.email = email;
     this.passwordHash = passwordHash;
     this.displayName = displayName;
     this.createdAt = createdAt || new Date();
+    this.phoneDeviceID = phoneDeviceID || null;
+    this.phonePrivateKey = phonePrivateKey || null;
+    this.fcmToken = fcmToken || null;
   }
 
   async save() {
@@ -20,6 +23,9 @@ class User {
         passwordHash: this.passwordHash,
         displayName: this.displayName,
         createdAt: this.createdAt,
+        phoneDeviceID: this.phoneDeviceID,
+        phonePrivateKey: this.phonePrivateKey,
+        fcmToken: this.fcmToken,
       });
       return true;
     } catch (error) {
@@ -45,7 +51,10 @@ class User {
         data.email,
         data.passwordHash,
         data.displayName,
-        data.createdAt
+        data.createdAt,
+        data.phoneDeviceID,
+        data.phonePrivateKey,
+        data.fcmToken
       );
     } catch (error) {
       console.error("Error finding user by email:", error);
@@ -86,10 +95,42 @@ class User {
         data.passwordHash,
         data.displayName,
         data.createdAt,
+        data.phoneDeviceID,
+        data.phonePrivateKey,
         data.fcmToken
       );
     } catch (error) {
       console.error("Error finding user by ID:", error);
+      throw error;
+    }
+  }
+
+  async updateEmail(newEmail) {
+    try {
+      // Check if the new email already exists
+      const existingUser = await User.findByEmail(newEmail);
+      if (existingUser) {
+        throw new Error("Email already in use by another account.");
+      }
+
+      await usersCollection.doc(this.uid).update({ email: newEmail });
+      this.email = newEmail;
+    } catch (error) {
+      console.error("Error updating email:", error);
+      throw error;
+    }
+  }
+
+  async updatePhoneDetails(phoneDeviceID, phonePrivateKey) {
+    try {
+      await usersCollection.doc(this.uid).update({
+        phoneDeviceID,
+        phonePrivateKey,
+      });
+      this.phoneDeviceID = phoneDeviceID;
+      this.phonePrivateKey = phonePrivateKey;
+    } catch (error) {
+      console.error("Error updating phone details:", error);
       throw error;
     }
   }
