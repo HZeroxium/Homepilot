@@ -124,7 +124,7 @@ class MqttService {
         await NotificationService.sendEmail({
           template: 'anomaly',
           to: user.email,
-          from: process.env.EMAIL_SENDER,
+          from: 'homepilothcmus@gmail.com',
           subject: '[HOMEPILOT] NOTIFICATION',
           text: 'Anomaly detected!',
           device_name: device.name,
@@ -158,7 +158,7 @@ class MqttService {
         await NotificationService.sendEmail({
           template: 'temperature',
           to: "hc",
-          from: process.env.EMAIL_SENDER,
+          from: 'homepilothcmus@gmail.com',
           subject: '[HOMEPILOT] NOTIFICATION',
           text: 'High temperature or humidity detected!',
           device_name: device.name,
