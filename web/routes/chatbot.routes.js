@@ -8,6 +8,5 @@ const router = express.Router();
 router.use(ensureAuthenticated);
 
 router.get('/', chatbotController.getChatbotPage);
-router.post('/message', chatbotController.sendMessage);
 
 export default router;

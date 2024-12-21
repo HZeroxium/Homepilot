@@ -78,8 +78,8 @@
   socket.on('botResponse', (response) => {
     const botMessage = document.createElement('div');
     botMessage.classList.add('alert', 'alert-danger', 'text-start');
-    botMessage.textContent = response;
+    botMessage.innerHTML = response.replace(/\n/g, '<br>');
     messagesContainer.appendChild(botMessage);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  });
+});
 </script>
